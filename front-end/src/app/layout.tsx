@@ -22,9 +22,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={roboto.className}>
-      <style>
-        <meta name="viewport" content="initial-scale=1, width=device-width" />
-      </style>
       <body>
         <CssBaseline />
         <ThemeRegistry options={{ key: 'mui' }}>{children}</ThemeRegistry>
