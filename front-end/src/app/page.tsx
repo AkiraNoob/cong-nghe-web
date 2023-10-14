@@ -1,7 +1,7 @@
 export default function Home() {
   return (
     <main>
-      <p>init</p>
+      <p>Test husky</p>
     </main>
   );
 }
