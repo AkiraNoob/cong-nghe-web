@@ -3,7 +3,8 @@
     "plugin:storybook/recommended",
     "next",
     "next/core-web-vitals",
-    "eslint:recommended"
+    "eslint:recommended",
+    "next/babel"
   ],
   "globals": {
     "React": "readonly"
