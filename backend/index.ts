@@ -1,14 +1,10 @@
-import dotenv from 'dotenv';
 import express, { Express } from 'express';
 import appLoader from './loader';
-
+import config from './config'
 const app: Express = express();
-dotenv.config();
 
 appLoader(app);
 
-const port = process.env.PORT;
-
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+app.listen(config.port, () => {
+  console.log(`⚡️[server]: Server is running at http://localhost:${config.port}`);
 });
