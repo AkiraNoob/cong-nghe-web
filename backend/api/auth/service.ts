@@ -65,7 +65,7 @@ const userServices = {
         const accessToken = jwt.sign(
           { username: foundUser.username, role: foundUser.role },
           process.env.ACCESS_TOKEN_SECRET as Secret,
-          { expiresIn: '10s' },
+          { expiresIn: '5h' },
         );
         // res.cookie('accessToken', accessToken, {
         //   maxAge: 300000, // 5 minutes
