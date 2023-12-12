@@ -1,12 +1,14 @@
-import express, { Express } from 'express';
-import apiRoute from '../api';
 import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
 import compression from 'compression';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import express, { Express } from 'express';
+import helmet from 'helmet';
+import apiRoute from '../api';
 
 const expressLoader = (app: Express) => {
   app.use(express.json());
+  app.use(helmet());
   app.use(
     cors({
       credentials: true,
@@ -19,7 +21,9 @@ const expressLoader = (app: Express) => {
   app.use(bodyParser.urlencoded({ extended: true }));
 
   app.use('/static', express.static('public'));
+
   app.use('/api/v1', apiRoute); // Root
+
   app.post('/test-url', (req, res) => {
     console.log(req.body);
     return res.send(req.body);
