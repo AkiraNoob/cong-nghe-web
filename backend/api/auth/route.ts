@@ -1,10 +1,12 @@
 import express from 'express';
-import userController from './controller';
-import isLogged from './validater';
+import authenticateMiddleware from '../../middleware/auth';
+import authController from './controller';
+import authValidator from './validator';
 
 const authRoute = express.Router();
-authRoute.post('/register', userController.register);
-authRoute.post('/login', userController.login);
-authRoute.get('/users', isLogged, userController.getUsers);
-authRoute.post('/logout', isLogged, userController.logout);
+
+authRoute.post('/register', authValidator.validateRegister, authController.register);
+authRoute.post('/login', authValidator.validateLocalLogin, authController.loginWithEmailAndPassword);
+authRoute.post('/logout', authenticateMiddleware, authController.logout);
+
 export default authRoute;

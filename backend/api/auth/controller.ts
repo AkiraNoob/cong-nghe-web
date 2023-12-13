@@ -1,27 +1,27 @@
 import { Request, Response } from 'express';
-import userServices from './service';
+import { catchError, tryCatchWrapper } from '../../common/catchError';
+import { removeAuthCookieFromClient, sendAuthCookieToClient } from '../../common/cookies';
+import { TLocalLoginPayload, TRegisterPayload } from '../../types/api/auth.types';
+import { TServiceResponseBodyType } from '../../types/general.types';
+import authServices from './service';
 
-const userController = {
-  register: async (req: Request, res: Response) => {
-    const result = await userServices.register(req);
-    res.status(result.statusCode).json(result.data);
+const authController = {
+  loginWithEmailAndPassword: async (req: Request, res: Response<TServiceResponseBodyType>) => {
+    try {
+      const { data, statusCode, message } = await authServices.loginWithEmailAndPassword(
+        req.body as TLocalLoginPayload,
+      );
+      sendAuthCookieToClient(res, data).status(statusCode).json({ data: null, message });
+    } catch (error) {
+      const errorObject = catchError(error);
+      res.status(errorObject.statusCode).json({ data: errorObject.data, message: errorObject.message });
+    }
   },
-  login: async (req: Request, res: Response) => {
-    const result = await userServices.login(req);
-    res.cookie('accessToken', result.data[0], {
-      maxAge: 300000, // 5 minutes
-      httpOnly: true,
-    });
-    // res.status(result.statusCode).json(result.data);
-    res.status(result.statusCode).json(result.data);
-  },
-  getUsers: async (req: Request, res: Response) => {
-    res.status(200).json("Login successfull and get users'");
-  },
-  logout: async (req: Request, res: Response) => {
-    const result = await userServices.logout(req, res);
-    res.status(result.statusCode).json(result.data);
+  register: tryCatchWrapper((req: Request) => authServices.register(req.body as TRegisterPayload)),
+  logout: (_req: Request, res: Response) => {
+    const { message, statusCode, data } = authServices.logout();
+    removeAuthCookieFromClient(res).status(statusCode).json({ data, message });
   },
 };
 
-export default userController;
+export default authController;
