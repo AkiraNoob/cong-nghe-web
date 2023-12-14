@@ -42,6 +42,7 @@ const authServices = {
       id: user._id.toString(),
       email: user.email,
       fullName: user.fullName,
+      role: user.role,
     };
 
     const token = signJWT(userData);
