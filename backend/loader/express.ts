@@ -12,6 +12,7 @@ const expressLoader = (app: Express) => {
   app.use(
     cors({
       credentials: true,
+      origin: [/^http:\/\/localhost/, /^http:\/\/127.0.0.1/, /127.0.0.1/],
     }),
   );
 
@@ -24,7 +25,7 @@ const expressLoader = (app: Express) => {
 
   app.use('/api/v1', apiRoute); // Root
 
-  app.post('/test-url', (req, res) => {
+  app.get('/test-url', (req, res) => {
     console.log(req.body);
     return res.send(req.body);
   });

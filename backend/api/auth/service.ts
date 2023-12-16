@@ -3,7 +3,7 @@ import { TReturnJWTType, signJWT } from '../../common/signJWT';
 import AppError from '../../constant/error';
 import { EHttpStatus } from '../../constant/statusCode';
 import UserModel from '../../models/user';
-import { TLocalLoginPayload, TRegisterPayload } from '../../types/api/auth.types';
+import { TLocalLoginPayload, TRegisterPayload, TUserMiddlewareParse } from '../../types/api/auth.types';
 import { TServiceResponseType } from '../../types/general.types';
 
 const authServices = {
@@ -38,10 +38,11 @@ const authServices = {
       throw new AppError(EHttpStatus.BAD_REQUEST, 'Wrong password');
     }
 
-    const userData = {
+    const userData: TUserMiddlewareParse = {
       id: user._id.toString(),
       email: user.email,
       fullName: user.fullName,
+      role: user.role,
     };
 
     const token = signJWT(userData);

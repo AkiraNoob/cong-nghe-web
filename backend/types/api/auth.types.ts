@@ -8,6 +8,7 @@ export type TJWTPayload = {
   id: string;
   fullName: string;
   email: string;
+  role: string;
 };
 
 export type TJWTVerify = {
@@ -16,3 +17,5 @@ export type TJWTVerify = {
   // seconds expired
   exp: number;
 } & TJWTPayload;
+
+export type TUserMiddlewareParse = Pick<TUserSchema, 'email' | 'fullName' | 'role'> & { id: string };

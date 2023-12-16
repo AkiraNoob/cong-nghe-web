@@ -2,11 +2,11 @@ import { NextFunction, Request, Response } from 'express';
 import passport from 'passport';
 import generateJWTStrategy from '../common/jwtStrategy';
 import { EHttpStatus } from '../constant/statusCode';
-import { TUserSchema } from '../types/schema/user.schema.types';
+import { TUserMiddlewareParse } from '../types/api/auth.types';
 
 const authenticateMiddleware = (req: Request, res: Response, next: NextFunction) => {
   passport.use(generateJWTStrategy());
-  passport.authenticate('jwt', { session: false }, (err: Error, user: TUserSchema) => {
+  passport.authenticate('jwt', { session: false }, (err: Error, user: TUserMiddlewareParse) => {
     if (err) {
       return next(err);
     }
@@ -14,6 +14,7 @@ const authenticateMiddleware = (req: Request, res: Response, next: NextFunction)
       res.status(EHttpStatus.UNAUTHORIZED).json({ message: 'Invalid Credentials' });
       return;
     }
+    req.user = user;
     return next();
   })(req, res, next);
 };

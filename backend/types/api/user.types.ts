@@ -8,4 +8,4 @@ export type TGetUserDetailByEmail = {
   email: string;
 };
 
-export type TGetUserDetailByIdDataResponse = Omit<TUserSchema, 'password'>;
+export type TGetUserDetailDataResponse = Omit<TUserSchema, 'password'>;
