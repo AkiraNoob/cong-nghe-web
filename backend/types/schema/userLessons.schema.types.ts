@@ -1,22 +1,19 @@
-import { ObjectId } from 'mongoose';
 import { ELessonType, ESelectionAnswerChoiceList, EUserLessonStatus } from '../../constant/enum/lesson.enum';
-import { TSchema } from './generic.schema.types';
 
-export type TUserLessonSchema = TSchema<{
-  userId: ObjectId;
-  lessonId: ObjectId;
-  courseId: ObjectId;
+export type TUserLessonSchema = {
+  userId: string;
+  lessonId: string;
+  courseId: string;
   status: EUserLessonStatus;
   type: ELessonType;
   checkpoint: TUserVideoLessonCheckpoint | TUserSelectionLessonCheckpoint[] | TUserCodescriptLessonCheckpoint;
-}>;
-
+};
 export type TUserVideoLessonCheckpoint = {
-  lastViewMoment: number;
+  lastViewMoment: string;
 };
 
 export type TUserSelectionLessonCheckpoint = {
-  choosenAsnwer: ESelectionAnswerChoiceList;
+  choosenAnswer: ESelectionAnswerChoiceList | null;
   isCorrect: boolean;
 };
 
