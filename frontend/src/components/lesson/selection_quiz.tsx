@@ -6,6 +6,7 @@ import { Button, IconButton } from '@mui/material';
 import { useState } from 'react';
 import { ESelectionAnswerChoiceList } from '~/constant/enum/lesson.enum';
 import deepClone from '~/helper/deepClone';
+import { useSubmitSelectionLessonResult } from '~/hooks/userLessons.ts/useSubmitUserLessons';
 
 export type TSelectionQuiz =
   | {
@@ -41,6 +42,7 @@ export default function SelectionQuiz({
   const [selectAnswerForEachQuestion, setSelectAnswerForEachQuestion] = useState<
     Array<ESelectionAnswerChoiceList | null>
   >(new Array(totalQuestion).fill(null));
+  const { mutate } = useSubmitSelectionLessonResult();
 
   return (
     <div className="space-y-[20px] text-black">
@@ -60,7 +62,17 @@ export default function SelectionQuiz({
             </IconButton>
           </div>
         </div>
-        <Button variant="contained" className="!w-fit">
+        <Button
+          onClick={() =>
+            mutate(
+              selectAnswerForEachQuestion.map((choosenAnswer) => ({
+                choosenAnswer: null,
+              })),
+            )
+          }
+          variant="contained"
+          className="!w-fit"
+        >
           Nộp bài
         </Button>
       </div>

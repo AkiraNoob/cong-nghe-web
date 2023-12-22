@@ -3,6 +3,11 @@ import moment from 'moment';
 import { ELessonType, EUserLessonStatus } from '../../constant/enum/lesson.enum';
 import AppError from '../../constant/error';
 import { EHttpStatus } from '../../constant/statusCode';
+import {
+  courseExistsMiddleware,
+  lessonBelongsToCourseMiddleware,
+  lessonExistsMiddleware,
+} from '../../middleware/exists';
 import UserLessonModel from '../../models/userLessons';
 import { TUserMiddlewareParse } from '../../types/api/auth.types';
 import {
@@ -11,17 +16,16 @@ import {
   TUserSelectionLessonResultSubmit,
   TUserVideoLessonResultSubmit,
 } from '../../types/api/userLesson.types';
-import {
-  TCodescriptLessonResourse,
-  TLessonSchema,
-  TSelectionLessonResourse,
-} from '../../types/schema/lesson.schema.types';
+import { TCodescriptLessonResourse, TSelectionLessonResourse } from '../../types/schema/lesson.schema.types';
 import { TUserSelectionLessonCheckpoint } from '../../types/schema/userLessons.schema.types';
 
 const lessonSerivce = {
   postResultVideoLesson: async (req: Request) => {
     const reqBody = req.body as TSubmitLessonResult<TUserVideoLessonResultSubmit>;
-    const lesson = req.body.lesson as TLessonSchema;
+
+    const lesson = await lessonExistsMiddleware(req);
+    const course = await courseExistsMiddleware(req);
+    await lessonBelongsToCourseMiddleware({ lesson, course });
 
     if (lesson.type !== ELessonType.Video) {
       throw new AppError(EHttpStatus.BAD_REQUEST, 'Lesson type is not matched.');
@@ -74,7 +78,10 @@ const lessonSerivce = {
 
   postResultSelectionLesson: async (req: Request) => {
     const reqBody = req.body as TSubmitLessonResult<TUserSelectionLessonResultSubmit>;
-    const lesson = req.body.lesson as TLessonSchema;
+
+    const lesson = await lessonExistsMiddleware(req);
+    const course = await courseExistsMiddleware(req);
+    await lessonBelongsToCourseMiddleware({ lesson, course });
 
     if (lesson.type !== ELessonType.Selection) {
       throw new AppError(EHttpStatus.BAD_REQUEST, 'Lesson type is not matched.');
@@ -116,7 +123,10 @@ const lessonSerivce = {
 
   postResultCodescriptLesson: async (req: Request) => {
     const reqBody = req.body as TSubmitLessonResult<TUserCodescriptLessonResultSubmit>;
-    const lesson = req.body.lesson as TLessonSchema;
+
+    const lesson = await lessonExistsMiddleware(req);
+    const course = await courseExistsMiddleware(req);
+    await lessonBelongsToCourseMiddleware({ lesson, course });
 
     if (lesson.type !== ELessonType.CodeScript) {
       throw new AppError(EHttpStatus.BAD_REQUEST, 'Lesson type is not matched.');

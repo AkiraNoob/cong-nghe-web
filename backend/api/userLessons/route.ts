@@ -1,10 +1,5 @@
 import express from 'express';
 import { ELessonType } from '../../constant/enum/lesson.enum';
-import {
-  courseExistsMiddleware,
-  lessonBelongsToCourseMiddleware,
-  lessonExistsMiddleware,
-} from '../../middleware/exists';
 import lessonController from './controller';
 import lessonValidator from './validator';
 
@@ -29,9 +24,6 @@ userLessonRoute.post(
   '/result',
   lessonValidator.validateSubmitLessonResultQuery,
   (req, res, next) => hashValidateAndController[req.query.type as ELessonType].validator(req, res, next),
-  lessonExistsMiddleware,
-  courseExistsMiddleware,
-  lessonBelongsToCourseMiddleware,
   (req, res, next) => hashValidateAndController[req.query.type as ELessonType].controller(req, res, next),
 );
 
