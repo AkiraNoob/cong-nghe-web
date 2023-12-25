@@ -25,34 +25,19 @@
 // };
 
 // export default YouTubePlayer;
-
+'use client';
+import { CldVideoPlayer } from 'next-cloudinary';
 import React from 'react';
-import YouTube, { Options } from 'react-youtube';
 
-interface YouTubePlayerProps {
-  videoId: string;
+interface VideoPlayerProps {
+  publicId: string;
 }
-
-const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
-  const opts: Options = {
-    height: '520',
-    width: '1040',
-    playerVars: {
-      autoplay: 0,
-    },
-  };
-
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ publicId }) => {
   return (
-    <div className="bg-zinc-950">
-      <div>
-        <YouTube
-          videoId={videoId}
-          opts={opts}
-          className="absolute top-0 left-0 w-full h-full relative flex justify-center items-center aspect-w-16 aspect-h-9"
-        />
-      </div>
+    <div>
+      <CldVideoPlayer src={publicId} controls width="640" height="360" />
     </div>
   );
 };
 
-export default YouTubePlayer;
+export default VideoPlayer;
