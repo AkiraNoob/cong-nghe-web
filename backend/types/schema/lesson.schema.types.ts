@@ -1,15 +1,18 @@
 import mongoose from 'mongoose';
 import { ELessonType, ESelectionAnswerChoiceList } from '../../constant/enum/lesson.enum';
 
-export type TLessonSchema = {
+export type TLessonResource = TVideoLessonResourse | TSelectionLessonResourse[] | TCodescriptLessonResourse[];
+
+export type TLessonSchema<T extends TLessonResource> = {
   courseId: string;
   title: string;
   description: string;
   type: ELessonType;
   /**total seconds if type === Video, else number (number of questions) */
   duration: number;
-  resource: TVideoLessonResourse | TSelectionLessonResourse[] | TCodescriptLessonResourse[];
-  comments: mongoose.Schema.Types.String[];
+  // resource: TVideoLessonResourse | TSelectionLessonResourse[] | TCodescriptLessonResourse[];
+  resource: T;
+  comments: string[];
 };
 
 export type TVideoLessonResourse = {
