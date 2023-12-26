@@ -11,7 +11,7 @@ const courseSchema = new Schema<TCourseSchema>({
   },
   description: {
     type: String,
-    maxlength: 256,
+    maxlength: 1000,
     required: true,
   },
   cover: {
@@ -23,7 +23,7 @@ const courseSchema = new Schema<TCourseSchema>({
     default: 0,
   },
   lessonIds: {
-    type: [Schema.Types.ObjectId],
+    type: [String],
     required: true,
     default: [],
   },
@@ -37,12 +37,12 @@ const courseSchema = new Schema<TCourseSchema>({
     default: [],
   },
   comments: {
-    type: [Schema.Types.ObjectId],
+    type: [String],
     required: true,
     default: [],
   },
   participantsId: {
-    type: [{ userId: Schema.Types.ObjectId, participatedDate: Date }],
+    type: [{ userId: String, participatedDate: Date }],
     required: true,
     default: [],
   },

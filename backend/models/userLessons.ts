@@ -16,15 +16,15 @@ const { Schema } = mongoose;
 
 const lessonSchema = new Schema<TUserLessonSchema>({
   userId: {
-    type: Schema.Types.ObjectId,
+    type: String,
     required: true,
   },
   lessonId: {
-    type: Schema.Types.ObjectId,
+    type: String,
     required: true,
   },
   courseId: {
-    type: Schema.Types.ObjectId,
+    type: String,
     required: true,
   },
   status: {
@@ -38,6 +38,8 @@ const lessonSchema = new Schema<TUserLessonSchema>({
     required: true,
   },
   checkpoint: {
+    type: Schema.Types.Mixed,
+    required: true,
     validate: function (value: TUserLessonSchema['checkpoint']) {
       const _this = this as unknown as TUserLessonSchema;
 

@@ -15,6 +15,10 @@ import {
 const { Schema } = mongoose;
 
 const lessonSchema = new Schema<TLessonSchema>({
+  courseId: {
+    type: String,
+    required: true,
+  },
   title: {
     type: String,
     required: true,
@@ -22,7 +26,7 @@ const lessonSchema = new Schema<TLessonSchema>({
   description: {
     type: String,
     required: true,
-    maxlength: 256,
+    maxlength: 1000,
   },
   type: {
     type: String,
@@ -35,7 +39,14 @@ const lessonSchema = new Schema<TLessonSchema>({
     min: 0,
     default: 0,
   },
+  comments: {
+    type: [String],
+    required: true,
+    default: [],
+  },
   resource: {
+    type: Schema.Types.Mixed,
+    required: true,
     validate: function (value: TLessonSchema['resource']) {
       const _this = this as unknown as TLessonSchema;
 

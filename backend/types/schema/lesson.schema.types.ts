@@ -1,16 +1,16 @@
-import { ObjectId } from 'mongoose';
+import mongoose from 'mongoose';
 import { ELessonType, ESelectionAnswerChoiceList } from '../../constant/enum/lesson.enum';
-import { TSchema } from './generic.schema.types';
 
-export type TLessonSchema = TSchema<{
+export type TLessonSchema = {
+  courseId: string;
   title: string;
   description: string;
   type: ELessonType;
   /**total seconds if type === Video, else number (number of questions) */
   duration: number;
   resource: TVideoLessonResourse | TSelectionLessonResourse[] | TCodescriptLessonResourse[];
-  comments: ObjectId[];
-}>;
+  comments: mongoose.Schema.Types.String[];
+};
 
 export type TVideoLessonResourse = {
   file: string;

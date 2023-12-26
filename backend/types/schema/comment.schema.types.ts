@@ -1,10 +1,7 @@
-import { ObjectId } from 'mongoose';
-import { TSchema } from './generic.schema.types';
-
-export type TCommentSchema = TSchema<{
+export type TCommentSchema = {
   userId: string;
   rating?: number;
-  likedUsers: ObjectId[];
-  unlikedUsers: ObjectId[];
-  replies: ObjectId[];
-}>;
+  likedUsers: string[];
+  unlikedUsers: string[];
+  replies: string[];
+};
