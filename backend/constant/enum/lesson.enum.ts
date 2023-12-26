@@ -13,4 +13,5 @@ export enum ESelectionAnswerChoiceList {
   A = 'A',
   B = 'B',
   C = 'C',
+  D = 'D',
 }

@@ -33,11 +33,11 @@ const lessonSchema = new Schema<TUserSchema>({
     type: String,
   },
   participatedCourses: {
-    type: [Schema.Types.ObjectId],
+    type: [String],
     default: [],
   },
   learningLessons: {
-    type: [Schema.Types.ObjectId],
+    type: [String],
     default: [],
   },
 });
