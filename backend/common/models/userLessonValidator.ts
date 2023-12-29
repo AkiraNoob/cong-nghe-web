@@ -22,9 +22,10 @@ export const selectionLessonResourceValidator = (_value: TUserSelectionLessonChe
     Array.isArray(_value) &&
     _value.every(
       (item) =>
-        typeof item.choosenAsnwer === 'string' &&
-        Object.values(ESelectionAnswerChoiceList).includes(item.choosenAsnwer) &&
-        typeof item.choosenAsnwer === 'boolean',
+        ((typeof item.choosenAnswer === 'string' &&
+          Object.values(ESelectionAnswerChoiceList).includes(item.choosenAnswer)) ||
+          item.choosenAnswer == null) &&
+        typeof item.isCorrect === 'boolean',
     )
   );
 };
