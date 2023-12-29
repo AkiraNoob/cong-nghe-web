@@ -13,6 +13,8 @@ import TableRow from '@mui/material/TableRow';
 import { grey, yellow } from '@mui/material/colors';
 import { styled } from '@mui/material/styles';
 import HeaderComponent from '~/components/header_component';
+
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -72,7 +74,7 @@ const CourseStatistics: React.FC = () => {
       <HeaderComponent></HeaderComponent>
       <div className='pr-10 pl-10 pb-10 pt-5'>
         <div className='flex justify-between pb-5'>
-          <h3 className="text-3xl font-bold mb-3">Thống kê khóa học</h3>
+          <h2 className="text-3xl font-bold mb-3">Thống kê khóa học</h2>
           <ColorButton variant="contained" startIcon = {<AddIcon/>}>
               Thêm khóa học
           </ColorButton>
@@ -81,6 +83,7 @@ const CourseStatistics: React.FC = () => {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
+                <StyledTableCell align='center'>STT</StyledTableCell>
                 <StyledTableCell>Khóa học</StyledTableCell>
                 <StyledTableCell align="center">Số lương bài giảng</StyledTableCell>
                 <StyledTableCell align="center">Ngày tạo</StyledTableCell>
@@ -92,6 +95,7 @@ const CourseStatistics: React.FC = () => {
             <TableBody>
               {rows.map((row) => (
                 <StyledTableRow key={row.name}>
+                  <StyledTableCell align='center'>{row.id}</StyledTableCell>
                   <StyledTableCell component="th" scope="row">
                     <div className='flex items-center'>
                     <CardMedia sx={{ height: 70, width: 90, borderRadius: 1, display: "flex" }} image={row.image} title="green iguana"></CardMedia>
