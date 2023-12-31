@@ -3,9 +3,7 @@ import AppError from '../constant/error';
 import { EHttpStatus } from '../constant/statusCode';
 import CourseModel from '../models/course';
 import LessonModel from '../models/lesson';
-import { TMockDocumentTypeWithId } from '../types/general.types';
-import { TCourseSchema } from '../types/schema/course.schema.types';
-import { TLessonSchema, TLessonResource } from '../types/schema/lesson.schema.types';
+import { TCourseDocument, TLessonDocument } from '../types/document.types';
 
 export const lessonExistsMiddleware = async (req: Request) => {
   const lessonId = req.body.lessonId || req.query.lessonId || req.params.lessonId;
@@ -29,8 +27,8 @@ export const lessonBelongsToCourseMiddleware = async ({
   course,
   lesson,
 }: {
-  course: TMockDocumentTypeWithId<TCourseSchema>;
-  lesson: TMockDocumentTypeWithId<TLessonSchema<TLessonResource>>;
+  course: TCourseDocument;
+  lesson: TLessonDocument;
 }) => {
   if (!course.lessonIds.includes(lesson._id.toString())) {
     throw new AppError(EHttpStatus.BAD_REQUEST, 'Lesson not belongs to course.');

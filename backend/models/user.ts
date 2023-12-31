@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
 import { EUserRole } from '../constant/enum/user.enum';
 import { EMAIL_REGEX } from '../constant/regex';
-import { TUserSchema } from '../types/schema/user.schema.types';
+import { TUserDocument } from '../types/document.types';
 
 const { Schema } = mongoose;
 
-const lessonSchema = new Schema<TUserSchema>({
+const userSchema = new Schema<TUserDocument>({
   email: {
     type: String,
     required: true,
@@ -42,6 +42,6 @@ const lessonSchema = new Schema<TUserSchema>({
   },
 });
 
-const UserModel = mongoose.model<TUserSchema>('Users', lessonSchema, 'Users');
+const UserModel = mongoose.model<TUserDocument>('Users', userSchema, 'Users');
 
 export default UserModel;

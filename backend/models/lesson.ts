@@ -1,14 +1,13 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import {
   codescriptLessonResourceValidator,
   selectionLessonResourceValidator,
   videoLessonResourceValidator,
 } from '../common/models/lessonValidator';
 import { ELessonType } from '../constant/enum/lesson.enum';
+import { TLessonDocument } from '../types/document.types';
 import {
-  TLessonResource,
   TCodescriptLessonResourse,
-  TLessonSchema,
   TSelectionLessonResourse,
   TVideoLessonResourse,
 } from '../types/schema/lesson.schema.types';
@@ -65,7 +64,6 @@ const lessonSchema = new Schema<TLessonDocument>({
 });
 
 // Define the document interface
-interface TLessonDocument extends Document, TLessonSchema<TLessonResource> {}
 
 const LessonModel = mongoose.model<TLessonDocument>('Lessons', lessonSchema, 'Lessons');
 
