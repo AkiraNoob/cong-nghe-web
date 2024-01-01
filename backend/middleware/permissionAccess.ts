@@ -24,25 +24,6 @@ export const userRolePermissionMiddleware =
     return;
   };
 
-export const adminRolePermissionMiddleware =
-  (roleAccess: EUserRole[] = [EUserRole.Admin, EUserRole.Student]) =>
-  (req: Request, res: Response, next: NextFunction) => {
-    if (!req.user) {
-      const err = new AppError(EHttpStatus.INTERNAL_SERVER_ERROR, 'Not have user in req.');
-      res.status(err.statusCode).json({ data: null, message: err.message });
-      return;
-    }
-    const userRole = (req.user as TUserMiddlewareParse).role;
-    if (roleAccess.includes(userRole) && userRole == EUserRole.Admin) {
-      console.log(req.user, ' is Admin');
-      next();
-      return;
-    }
-
-    const err = new AppError(EHttpStatus.FORBIDDEN, 'You do not have access to this resource.');
-    res.status(err.statusCode).json({ data: null, message: err.message });
-    return;
-  };
 export const userJoinedCoursePermissionMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const _req = req as Request & { course: TCourseSchema };
 
