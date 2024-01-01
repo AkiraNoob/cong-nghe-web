@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 import { ECourseStatus } from '../constant/enum/course.enum';
-import { TCourseSchema } from '../types/schema/course.schema.types';
+import { TCourseDocument } from '../types/document.types';
 
 const { Schema } = mongoose;
 
-const courseSchema = new Schema<TCourseSchema>({
+const courseSchema = new Schema<TCourseDocument>({
   title: {
     type: String,
     required: true,
@@ -48,6 +48,6 @@ const courseSchema = new Schema<TCourseSchema>({
   },
 });
 
-const CourseModel = mongoose.model<TCourseSchema>('Courses', courseSchema, 'Courses');
+const CourseModel = mongoose.model<TCourseDocument>('Courses', courseSchema, 'Courses');
 
 export default CourseModel;

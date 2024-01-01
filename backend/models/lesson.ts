@@ -1,20 +1,18 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import {
   codescriptLessonResourceValidator,
   selectionLessonResourceValidator,
   videoLessonResourceValidator,
 } from '../common/models/lessonValidator';
 import { ELessonType } from '../constant/enum/lesson.enum';
+import { TLessonDocument } from '../types/document.types';
 import {
   TCodescriptLessonResourse,
-  TLessonSchema,
   TSelectionLessonResourse,
   TVideoLessonResourse,
 } from '../types/schema/lesson.schema.types';
 
-const { Schema } = mongoose;
-
-const lessonSchema = new Schema<TLessonSchema>({
+const lessonSchema = new Schema<TLessonDocument>({
   courseId: {
     type: String,
     required: true,
@@ -47,8 +45,8 @@ const lessonSchema = new Schema<TLessonSchema>({
   resource: {
     type: Schema.Types.Mixed,
     required: true,
-    validate: function (value: TLessonSchema['resource']) {
-      const _this = this as unknown as TLessonSchema;
+    validate: function (value: TLessonDocument['resource']) {
+      const _this = this as unknown as TLessonDocument;
 
       if (_this.type === ELessonType.CodeScript) {
         return codescriptLessonResourceValidator(value as TCodescriptLessonResourse[]);
@@ -65,6 +63,8 @@ const lessonSchema = new Schema<TLessonSchema>({
   },
 });
 
-const LessonModel = mongoose.model<TLessonSchema>('Lessons', lessonSchema, 'Lessons');
+// Define the document interface
+
+const LessonModel = mongoose.model<TLessonDocument>('Lessons', lessonSchema, 'Lessons');
 
 export default LessonModel;

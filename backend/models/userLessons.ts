@@ -5,6 +5,7 @@ import {
   videoUserLessonCheckpointValidator,
 } from '../common/models/userLessonValidator';
 import { ELessonType, EUserLessonStatus } from '../constant/enum/lesson.enum';
+import { TUserLessonDocument } from '../types/document.types';
 import {
   TUserCodescriptLessonCheckpoint,
   TUserLessonSchema,
@@ -14,7 +15,7 @@ import {
 
 const { Schema } = mongoose;
 
-const lessonSchema = new Schema<TUserLessonSchema>({
+const userLessonSchema = new Schema<TUserLessonDocument>({
   userId: {
     type: String,
     required: true,
@@ -58,6 +59,6 @@ const lessonSchema = new Schema<TUserLessonSchema>({
   },
 });
 
-const UserLessonModel = mongoose.model<TUserLessonSchema>('User_Lesson', lessonSchema, 'User_Lesson');
+const UserLessonModel = mongoose.model<TUserLessonDocument>('User_Lesson', userLessonSchema, 'User_Lesson');
 
 export default UserLessonModel;
