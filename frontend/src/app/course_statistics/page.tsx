@@ -13,6 +13,7 @@ import TableRow from '@mui/material/TableRow';
 import { grey, yellow } from '@mui/material/colors';
 import { styled } from '@mui/material/styles';
 import HeaderComponent from '~/components/header_component';
+import SttCourse from '~/components/statistics/stt_course';
 
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -73,13 +74,13 @@ const CourseStatistics: React.FC = () => {
     <div>
       <HeaderComponent></HeaderComponent>
       <div className='pr-10 pl-10 pb-10 pt-5'>
-        <div className='flex justify-between pb-5'>
+        <div className='sm:flex sm:justify-between pb-5'>
           <h2 className="text-3xl font-bold mb-3">Thống kê khóa học</h2>
           <ColorButton variant="contained" startIcon = {<AddIcon/>}>
               Thêm khóa học
           </ColorButton>
         </div>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} className='hidden sm:block'>
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
@@ -121,6 +122,22 @@ const CourseStatistics: React.FC = () => {
             </TableBody>
           </Table>
         </TableContainer>
+        <div className="block md:hidden grid-cols-1">
+          {rows.map((item, index) => (
+            <div key={index}>
+              <SttCourse
+                id={item.id}
+                name={item.name}
+                numberlesson={item.numberlesson}
+                time={item.time}
+                numbermember={item.numbermember}
+                rating={item.rating}
+                image={item.image}
+                onClick={ () => handleButtonClick(item.id)}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
