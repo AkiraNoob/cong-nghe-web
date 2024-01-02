@@ -3,7 +3,6 @@ import { EHttpStatus } from '../../constant/statusCode';
 import UserModel from '../../models/user';
 import { TUserMiddlewareParse } from '../../types/api/auth.types';
 import { TGetUserDetailByEmail, TGetUserDetailById, TGetUserDetailDataResponse } from '../../types/api/user.types';
-
 import { TServiceResponseType } from '../../types/general.types';
 import { TUserSchema } from '../../types/schema/user.schema.types';
 
