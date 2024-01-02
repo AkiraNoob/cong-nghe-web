@@ -7,6 +7,8 @@ import { grey } from '@mui/material/colors';
 import { styled } from '@mui/material/styles';
 import React from 'react';
 import HeaderComponent from '~/components/header_component';
+import SttLesson from '~/components/statistics/stt_lesson';
+import SttStudent from '~/components/statistics/stt_student';
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -87,9 +89,9 @@ const CourseStatisticsDetail: React.FC  = () => {
       <HeaderComponent></HeaderComponent>
       <div className='pr-10 pl-10 pb-10 pt-5'>
         <div>
-          <h2 className="text-3xl font-bold mb-3">Thống kê chi tiết khóa học</h2>
-          <h2 className="text-2xl font-bold mb-3">Lập Trình JavaScript Cơ Bản</h2>
-          <div className='w-1/2 mb-3'>
+          <h2 className=" text-2xl md:text-3xl font-bold mb-3">Thống kê chi tiết khóa học</h2>
+          <h2 className=" text-1xl md:text-2xl font-bold mb-3">Lập Trình JavaScript Cơ Bản</h2>
+          <div className='md:w-1/2 mb-3'>
               <span className='text-gray-600'>
               JavaScript is a programming language that adds interactivity to your website
                (for example games, responses when buttons are pressed or data is entered in forms, dynamic styling, andanimation). 
@@ -110,6 +112,7 @@ const CourseStatisticsDetail: React.FC  = () => {
             </Box>
             <TabPanel value="1">
               <div>
+              <div className='hidden sm:block'>
                 <TableContainer component={Paper}>
                   <Table sx={{ minWidth: 700 }} aria-label="customized table">
                     <TableHead>
@@ -137,9 +140,24 @@ const CourseStatisticsDetail: React.FC  = () => {
                   </Table>
                 </TableContainer>
               </div>
+              <div className="block md:hidden grid-cols-1">
+                {rows_lesson.map((item, index) => (
+                  <div key={index}>
+                    <SttLesson
+                      id={item.id}
+                      name={item.name}
+                      timelesson={item.timelesson}
+                      timecreate={item.timecreate}
+                      typelesson={item.typelesson}
+                      done={item.done}
+                    ></SttLesson>
+                  </div>
+                ))}
+              </div>
+              </div>
             </TabPanel>
             <TabPanel value="2">
-              <div>
+              <div  className='hidden sm:block' >
                 <TableContainer component={Paper}>
                   <Table sx={{ minWidth: 700 }} aria-label="customized table">
                     <TableHead>
@@ -171,6 +189,19 @@ const CourseStatisticsDetail: React.FC  = () => {
                     </TableBody>
                   </Table>
                 </TableContainer>
+              </div>
+              <div className="block md:hidden grid-cols-1">
+                {rows_student.map((item, index) => (
+                  <div key={index}>
+                    <SttStudent
+                      id={item.id}
+                      name={item.name}
+                      avatar={item.avatar}
+                      timejoin={item.timejoin}
+                      onclick={ () => handleButtonClick(item.id)}
+                    ></SttStudent>
+                  </div>
+                ))}
               </div>
             </TabPanel>
           </TabContext>
