@@ -64,4 +64,11 @@ const userLessonSchema = new Schema<TUserLessonDocument>(
 
 const UserLessonModel = mongoose.model<TUserLessonDocument>('User_Lesson', userLessonSchema, 'User_Lesson');
 
+UserLessonModel.collection.createIndex(
+  { userId: 1, courseId: 1, lessonId: 1 },
+  {
+    unique: true,
+  },
+);
+
 export default UserLessonModel;

@@ -1,4 +1,4 @@
-import { TCourseDocument, TLessonDocument, TUserDocument } from '../document.types';
+import { TCourseDocument, TLessonDocument, TUserDocument, TUserLessonDocument } from '../document.types';
 
 export type TGetAllCourseStatisticResponse = Pick<
   TCourseDocument,
@@ -14,6 +14,14 @@ export type TGetAllLessonOfCourseStatisticResponse = Pick<
   'title' | 'duration' | 'createdAt' | 'type'
 > & {
   completedTimes: number;
+};
+
+export type TGetMemberOfCourseStatisticResponse = Pick<TLessonDocument, 'title' | 'duration' | 'createdAt' | 'type'> & {
+  status: TUserLessonDocument['status'] | null;
+  result: {
+    completed: number;
+    total: number;
+  } | null;
 };
 
 export type TGetDetailStatisticOfCourseRequest = {
