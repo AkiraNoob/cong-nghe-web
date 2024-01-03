@@ -3,7 +3,7 @@ import AddIcon from '@mui/icons-material/Add';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
-import { AppBar, Button, ButtonProps, CardMedia, Dialog, IconButton, TextField, Toolbar, Typography } from '@mui/material';
+import { AppBar, Button, ButtonProps, CardMedia, Dialog, Divider, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Toolbar, Typography } from '@mui/material';
 import Slide from '@mui/material/Slide';
 import { grey } from '@mui/material/colors';
 import { styled } from '@mui/material/styles';
@@ -12,6 +12,7 @@ import React, { ChangeEvent, useRef } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import HeaderComponent from '~/components/header_component';
 import LessonOwner from '~/components/lesson/lesson_owner';
+import SelectionQuestion from '~/components/lesson/selection_question';
 const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
   color: theme.palette.getContrastText(grey[900]),
   backgroundColor: grey[900],
@@ -29,7 +30,13 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-
+interface ListItem {
+  id: string;
+  name: string;
+  quantity: string;
+  exerciseType: string;
+  ischecked: boolean;
+}
 
 const CourseUpdateAdd: React.FC = () => {
 
@@ -37,9 +44,30 @@ const CourseUpdateAdd: React.FC = () => {
 
   const [open, setOpen] = React.useState(false);
 
-  const [name, setName] = React.useState('Lập Trình JavaScript Cơ Bản');
+  const [nameCourse, setNameCourse] = React.useState('Lập Trình JavaScript Cơ Bản');
 
   const [description, setDescription] = React.useState('JavaScript is a programming language that adds interactivity to your website for example games, responses when buttons are pressed or data is entered in forms, dynamic styling, andanimation. This article helps you get started with this exciting language and gives you an idea of what is possible');
+
+  const [typeLesson, settypeLesson] = React.useState('');
+
+  const [numQuestion, setnumQuestion] = React.useState(0);
+
+
+  const handleNumQuestionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    const numericValue = parseInt(value, 10); // Chuyển đổi giá trị thành số
+
+    if (!isNaN(numericValue)) {
+      setnumQuestion(numericValue);
+    }else {
+      setnumQuestion(0); // Xóa giá trị bằng cách gán rỗng
+    }
+  };
+
+  const handleChange = (event: SelectChangeEvent) => {
+    settypeLesson(event.target.value as string);
+  };
+
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -74,7 +102,7 @@ const CourseUpdateAdd: React.FC = () => {
     },
     {
       id: '2',
-      name: 'Bài tập: Lập trình C Bài tập: Lập trình C',
+      name: 'Bài tập: Lập trình C',
       quantity: '12 test',
       exerciseType: 'selection_quiz',
       ischecked: true,
@@ -103,13 +131,13 @@ const CourseUpdateAdd: React.FC = () => {
   ];
 
 
-  // const [items, setItems] = useState<ListItem[]>(initialItems);
+  // const [items, setItems] = useState<ListItem[]>(data2);
 
   // const handleDragEnd = (result: DropResult) => {
   //   if (!result.destination) {
   //     return;
   //   }
-
+    
   //   const updatedItems = Array.from(items);
   //   const [removed] = updatedItems.splice(result.source.index, 1);
   //   updatedItems.splice(result.destination.index, 0, removed);
@@ -132,7 +160,7 @@ const CourseUpdateAdd: React.FC = () => {
           </div>
           <div className='flex justify-between'>
             <div className='md:mr-10 md:mt-0 mt-3'>
-              <h2 className=" text-2xl md:text-3xl font-bold mb-3">{name}</h2>
+              <h2 className=" text-2xl md:text-3xl font-bold mb-3">{nameCourse}</h2>
               <div className='mb-3'>
                   <span className='text-gray-600'>
                   {description}
@@ -152,65 +180,103 @@ const CourseUpdateAdd: React.FC = () => {
                Thêm bài giảng
             </ColorButton>
           </div>
-          {/* <DragDropContext onDragEnd={() => {}}>
-            <div className="space-y-4 w-1/4">
-              {data2.map((item, index) => (
-                <Droppable key={item.id} droppableId={`droppable${item.id}`}>
-                  {
-                    (
-                      provided
-                    )=>(
-                      <div key={index}
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                      >
-                        <LessonOwner
-                          id={item.id}
-                          name={item.name}
-                          quantity={item.quantity}
-                          exerciseType={item.exerciseType}
-                          isChoose={item.ischecked}
-                        />
-
-                      </div>
-                    )
-                  }
-                  
-                </Droppable>
-              ))}
-            </div>
-          </DragDropContext> */}
-          <DragDropContext onDragEnd={()=>{}}>
-            <div className='flex my-10 gap-5'>
-            <Droppable droppableId="list" >
-              {(provided) => (
-                <div className="border-dashed border border-gray-100 w-1/4"
-                ref={provided.innerRef} {...provided.droppableProps}>
-                  {data2.map((item, index) => (
-                    <Draggable key={item.id} draggableId={item.id} index={index}>
-                      {(provided) => (
-                        <div className='m-1 p-1 select-none'
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                        >
-                          <LessonOwner
-                            id={item.id}
-                            name={item.name}
-                            quantity={item.quantity}
-                            exerciseType={item.exerciseType}
-                            isChoose={item.ischecked}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
+          <div className='flex mt-3'>
+            <DragDropContext onDragEnd={()=>{}}>
+              <Droppable droppableId="list" >
+                {(provided) => (
+                  <div className="border-dashed border border-gray-100 w-1/4"
+                  ref={provided.innerRef} {...provided.droppableProps}>
+                    {data2.map((item, index) => (
+                      <Draggable key={item.id} draggableId={item.id} index={index}>
+                        {(provided) => (
+                          <div className='m-1 p-1 select-none'
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            <LessonOwner
+                              id={item.id}
+                              name={item.name}
+                              quantity={item.quantity}
+                              exerciseType={item.exerciseType}
+                              isChoose={item.ischecked}
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+            <div className='border-2 border-gray-300 w-3/4 rounded-2xl'>
+              <div className='flex-col flex space-y-4 p-7'>
+                <TextField
+                label="Tiêu đề bài học"
+                name="title"
+                value={nameCourse}
+                onChange={(e) => setNameCourse(e.target.value)}
+                multiline
+                required
+                />
+                <TextField
+                  label="Mô tả bài học"
+                  name="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  multiline
+                  required
+                />
+                <div className='w-1/3'>
+                  <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label" required>Loại bài giảng</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={typeLesson}
+                      label="Loại bài giảng"
+                      onChange={handleChange}
+                      required
+                    >
+                      <MenuItem value={'video'}>Video</MenuItem>
+                      <MenuItem value={'selection'}>Selection</MenuItem>
+                      <MenuItem value={'code script'}>Code script</MenuItem>
+                    </Select>
+                  </FormControl>
                 </div>
-              )}
-            </Droppable>
-            </div>      
-          </DragDropContext>    
+                <Divider light />
+                {typeLesson === 'selection' && (
+                  <div>
+                    A B C D ne
+                  </div>
+                )}
+
+                {typeLesson === 'video' && (
+                  <div className='space-y-4'>
+                    <TextField
+                      label="Số lượng câu hỏi"
+                      name="description"
+                      type='number'
+                      value={numQuestion}
+                      onChange={handleNumQuestionChange}
+                      multiline
+                      required
+                    />
+                    <SelectionQuestion id='1' nameLesson='' descriptionLesson='' textResultA='' textResultB='' textResultC='' textResultD=''></SelectionQuestion>
+                  </div>
+                )}
+
+                {typeLesson === 'code script' && (
+                  <div>
+                    test case
+                  </div>
+                )}
+                
+              </div>
+            </div>
+          </div>
+          
         </div>
 
         <Dialog
@@ -240,8 +306,8 @@ const CourseUpdateAdd: React.FC = () => {
             <TextField
               label="Tiêu đề khóa học"
               name="title"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={nameCourse}
+              onChange={(e) => setNameCourse(e.target.value)}
               multiline
               required
             />
