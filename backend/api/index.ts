@@ -6,11 +6,12 @@ import userRoute from './user/route';
 import userLessonRoute from './userLessons/route';
 import lessonRoute from './lesson/route';
 import { EUserRole } from '../constant/enum/user.enum';
+import courseRoute from './course/route';
 const apiRoute = express.Router();
 
 apiRoute.use('/auth', authRoute);
 apiRoute.use('/user', authenticateMiddleware, userRoute);
 apiRoute.use('/lesson', authenticateMiddleware, userRolePermissionMiddleware([EUserRole.Admin]), lessonRoute);
 apiRoute.use('/user-lessons', authenticateMiddleware, userRolePermissionMiddleware(), userLessonRoute);
-
+apiRoute.use('/course', authenticateMiddleware, userRolePermissionMiddleware([EUserRole.Admin]), courseRoute);
 export default apiRoute;
