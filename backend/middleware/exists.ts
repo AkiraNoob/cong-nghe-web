@@ -5,7 +5,7 @@ import CourseModel from '../models/course';
 import LessonModel from '../models/lesson';
 import { TCourseDocument, TLessonDocument } from '../types/document.types';
 
-export const lessonExistsMiddleware = async (req: Request) => {
+export const lessonExistsMiddleware = async (req: Request): Promise<TLessonDocument> => {
   const lessonId = req.body.lessonId || req.query.lessonId || req.params.lessonId;
   const lesson = await LessonModel.findById(lessonId);
   if (!lesson) {
@@ -14,7 +14,7 @@ export const lessonExistsMiddleware = async (req: Request) => {
   return lesson;
 };
 
-export const courseExistsMiddleware = async (req: Request) => {
+export const courseExistsMiddleware = async (req: Request): Promise<TCourseDocument> => {
   const courseId = req.body.courseId || req.query.courseId || req.params.courseId;
   const course = await CourseModel.findById(courseId);
   if (!course) {

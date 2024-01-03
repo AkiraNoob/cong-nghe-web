@@ -7,6 +7,8 @@ import { TUserLessonSchema } from './schema/userLessons.schema.types';
 export type TDocument<T> = Document<unknown, object, T> &
   T & {
     _id: mongoose.Types.ObjectId;
+    createdAt: string;
+    updatedAt: string;
   };
 
 export type TCourseDocument = TDocument<TCourseSchema>;
