@@ -9,7 +9,9 @@ import { grey } from '@mui/material/colors';
 import { styled } from '@mui/material/styles';
 import { TransitionProps } from '@mui/material/transitions';
 import React, { ChangeEvent, useRef } from 'react';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import HeaderComponent from '~/components/header_component';
+import LessonOwner from '~/components/lesson/lesson_owner';
 const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
   color: theme.palette.getContrastText(grey[900]),
   backgroundColor: grey[900],
@@ -27,16 +29,6 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-// interface ListItem {
-//   id: string;
-//   content: string;
-// }
-
-// const initialItems: ListItem[] = [
-//   { id: 'item-1', content: 'Item 1' },
-//   { id: 'item-2', content: 'Item 2' },
-//   { id: 'item-3', content: 'Item 3' },
-// ];
 
 
 const CourseUpdateAdd: React.FC = () => {
@@ -72,6 +64,43 @@ const CourseUpdateAdd: React.FC = () => {
   const handleButtonClick = (data: string) =>{
     
   };
+  const data2 = [
+    {
+      id: '1',
+      name: 'Bài 1: Lập trình C',
+      quantity: '12:40',
+      exerciseType: 'video',
+      ischecked: true,
+    },
+    {
+      id: '2',
+      name: 'Bài tập: Lập trình C Bài tập: Lập trình C',
+      quantity: '12 test',
+      exerciseType: 'selection_quiz',
+      ischecked: true,
+    },
+    {
+      id: '3',
+      name: 'Bài tập: Lập trình C',
+      quantity: '12 test',
+      exerciseType: 'code_quiz',
+      ischecked: true,
+    },
+    {
+      id: '4',
+      name: 'Bài 2: Lập trình C',
+      quantity: '12:40',
+      exerciseType: 'video',
+      ischecked: false,
+    },
+    {
+      id: '5',
+      name: 'Bài tập: Lập trình C',
+      quantity: '12 test',
+      exerciseType: 'selection_quiz',
+      ischecked: false,
+    },
+  ];
 
 
   // const [items, setItems] = useState<ListItem[]>(initialItems);
@@ -87,15 +116,6 @@ const CourseUpdateAdd: React.FC = () => {
 
   //   setItems(updatedItems);
   // };
-  // const onDragEnd = (result: DropResult) =>{
-  //     const {source, destination} = result;
-  // }
-  // const onDragStart = (result: DropResult) =>{
-  //   const {source, destination} = result;
-  // }
-  // const onDragUpdate = (result: DropResult) =>{
-  //     const {source, destination} = result;
-  // }
 
 
   return (
@@ -128,11 +148,69 @@ const CourseUpdateAdd: React.FC = () => {
           </div>
           <div className='flex justify-between mt-10'>
             <h2 className=" text-1xl md:text-2xl font-bold mb-3">Nội dung khóa học</h2>
-            <ColorButton variant="contained" startIcon = {<AddIcon/>} onClick={handleClickOpen}>
+            <ColorButton variant="contained" startIcon = {<AddIcon/>} onClick={()=>{}}>
                Thêm bài giảng
             </ColorButton>
           </div>
-          
+          {/* <DragDropContext onDragEnd={() => {}}>
+            <div className="space-y-4 w-1/4">
+              {data2.map((item, index) => (
+                <Droppable key={item.id} droppableId={`droppable${item.id}`}>
+                  {
+                    (
+                      provided
+                    )=>(
+                      <div key={index}
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                      >
+                        <LessonOwner
+                          id={item.id}
+                          name={item.name}
+                          quantity={item.quantity}
+                          exerciseType={item.exerciseType}
+                          isChoose={item.ischecked}
+                        />
+
+                      </div>
+                    )
+                  }
+                  
+                </Droppable>
+              ))}
+            </div>
+          </DragDropContext> */}
+          <DragDropContext onDragEnd={()=>{}}>
+            <div className='flex my-10 gap-5'>
+            <Droppable droppableId="list" >
+              {(provided) => (
+                <div className="border-dashed border border-gray-100 w-1/4"
+                ref={provided.innerRef} {...provided.droppableProps}>
+                  {data2.map((item, index) => (
+                    <Draggable key={item.id} draggableId={item.id} index={index}>
+                      {(provided) => (
+                        <div className='m-1 p-1 select-none'
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <LessonOwner
+                            id={item.id}
+                            name={item.name}
+                            quantity={item.quantity}
+                            exerciseType={item.exerciseType}
+                            isChoose={item.ischecked}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+            </div>      
+          </DragDropContext>    
         </div>
 
         <Dialog
