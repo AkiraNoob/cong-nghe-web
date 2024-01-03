@@ -14,6 +14,11 @@ statisticRoute.get(
   statisticValidator.validateGetDetailStatisticOfCourse,
   statisticController.getlAllLessonssOfCourseStatistic,
 );
+statisticRoute.get(
+  '/detail-member',
+  statisticValidator.validateGetDetailStatisticOfMemberOfCourse,
+  statisticController.getlMemberOfCourseStatistic,
+);
 statisticRoute.get('/all-courses', statisticController.getAllCourseStatistic);
 
 export default statisticRoute;

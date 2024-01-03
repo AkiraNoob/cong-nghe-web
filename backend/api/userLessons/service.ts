@@ -8,6 +8,7 @@ import {
   lessonBelongsToCourseMiddleware,
   lessonExistsMiddleware,
 } from '../../middleware/exists';
+import { userJoinedCoursePermissionMiddleware } from '../../middleware/permissionAccess';
 import UserLessonModel from '../../models/userLessons';
 import { TUserMiddlewareParse } from '../../types/api/auth.types';
 import {
@@ -25,6 +26,7 @@ const lessonSerivce = {
 
     const lesson = await lessonExistsMiddleware(req);
     const course = await courseExistsMiddleware(req);
+    await userJoinedCoursePermissionMiddleware(course, (req.user as TUserMiddlewareParse).id);
     await lessonBelongsToCourseMiddleware({ lesson, course });
 
     if (lesson.type !== ELessonType.Video) {
@@ -81,6 +83,7 @@ const lessonSerivce = {
 
     const lesson = await lessonExistsMiddleware(req);
     const course = await courseExistsMiddleware(req);
+    await userJoinedCoursePermissionMiddleware(course, (req.user as TUserMiddlewareParse).id);
     await lessonBelongsToCourseMiddleware({ lesson, course });
 
     if (lesson.type !== ELessonType.Selection) {
@@ -126,6 +129,7 @@ const lessonSerivce = {
 
     const lesson = await lessonExistsMiddleware(req);
     const course = await courseExistsMiddleware(req);
+    await userJoinedCoursePermissionMiddleware(course, (req.user as TUserMiddlewareParse).id);
     await lessonBelongsToCourseMiddleware({ lesson, course });
 
     if (lesson.type !== ELessonType.CodeScript) {

@@ -1,7 +1,8 @@
 import { Request } from 'express';
-import { EUserLessonStatus } from '../../constant/enum/lesson.enum';
+import { ELessonType, EUserLessonStatus } from '../../constant/enum/lesson.enum';
 import { EHttpStatus } from '../../constant/statusCode';
 import { courseExistsMiddleware } from '../../middleware/exists';
+import { userJoinedCoursePermissionMiddleware } from '../../middleware/permissionAccess';
 import CourseModel from '../../models/course';
 import LessonModel from '../../models/lesson';
 import UserModel from '../../models/user';
@@ -10,8 +11,15 @@ import {
   TGetAllCourseStatisticResponse,
   TGetAllLessonOfCourseStatisticResponse,
   TGetAllMembersOfCourseStatisticResponse,
+  TGetDetailStatisticMemberOfCourseRequest,
+  TGetMemberOfCourseStatisticResponse,
 } from '../../types/api/statistic.types';
 import { TServiceResponseType } from '../../types/general.types';
+import { TCodescriptLessonResourse, TSelectionLessonResourse } from '../../types/schema/lesson.schema.types';
+import {
+  TUserCodescriptLessonCheckpoint,
+  TUserSelectionLessonCheckpoint,
+} from '../../types/schema/userLessons.schema.types';
 
 const statisticService = {
   getAllCourse: async (): Promise<TServiceResponseType<TGetAllCourseStatisticResponse[]>> => {
@@ -97,33 +105,64 @@ const statisticService = {
       message: 'Get all lessons statistic of course successfully',
     };
   },
-  getMemberOfCourse: async (req: Request): Promise<TServiceResponseType<TGetAllLessonOfCourseStatisticResponse[]>> => {
+  getMemberOfCourse: async (req: Request): Promise<TServiceResponseType<TGetMemberOfCourseStatisticResponse[]>> => {
+    const reqBody = req.body as TGetDetailStatisticMemberOfCourseRequest;
+
     const course = await courseExistsMiddleware(req);
-    const lessons = course.lessonIds;
+    await userJoinedCoursePermissionMiddleware(course, reqBody.userId);
 
-    const concurrentPromise = lessons.map(async (item) => {
-      return Promise.all([
-        LessonModel.findById(item).then((item) => ({
-          title: item?.title,
-          createdAt: item?.createdAt,
-          duration: item?.duration,
-          type: item?.type,
-        })),
-        UserLessonModel.countDocuments({ lessonId: item, status: EUserLessonStatus.Done }),
-      ]).then((item) => ({
-        ...item[0],
-        completedTimes: item[1],
-      }));
-    });
+    const lessons = await LessonModel.find({ courseId: reqBody.courseId });
 
-    const response = (await Promise.all(concurrentPromise).then((item) =>
-      item.filter((item) => item != null),
-    )) as TGetAllLessonOfCourseStatisticResponse[];
+    const concurrentPromise = lessons.map((item) =>
+      UserLessonModel.findOne({
+        //document contains all below condition only exist 1 due to indexes
+        courseId: reqBody.courseId,
+        lessonId: item._id,
+        userId: reqBody.userId,
+      }).then((userLessonItem): TGetMemberOfCourseStatisticResponse => {
+        let result: TGetMemberOfCourseStatisticResponse['result'] = null;
+
+        if (userLessonItem !== null) {
+          switch (userLessonItem.type) {
+            case ELessonType.Video:
+              break;
+            case ELessonType.CodeScript:
+              result = {
+                completed: (userLessonItem.checkpoint as TUserCodescriptLessonCheckpoint).result.filter((item) => item)
+                  .length,
+                total: (item.resource as TCodescriptLessonResourse[]).length,
+              };
+              break;
+            case ELessonType.Selection:
+              result = {
+                completed: (userLessonItem.checkpoint as TUserSelectionLessonCheckpoint[]).filter(
+                  (item) => item.isCorrect,
+                ).length,
+                total: (item.resource as TSelectionLessonResourse[]).length,
+              };
+              break;
+            default:
+              break;
+          }
+        }
+
+        return {
+          status: userLessonItem?.status || null,
+          title: item.title,
+          duration: item.duration,
+          createdAt: item.createdAt,
+          type: item.type,
+          result,
+        };
+      }),
+    );
+
+    const response = await Promise.all(concurrentPromise);
 
     return {
       data: response,
       statusCode: EHttpStatus.OK,
-      message: 'Get all members statistic of course successfully',
+      message: 'Get member detail statistic of course successfully',
     };
   },
 };
