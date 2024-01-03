@@ -17,4 +17,5 @@ apiRoute.use('/user-lessons', authenticateMiddleware, userRolePermissionMiddlewa
 apiRoute.use('/course', authenticateMiddleware, userRolePermissionMiddleware([EUserRole.Admin]), courseRoute);
 apiRoute.use('/statistic', authenticateMiddleware, userRolePermissionMiddleware(), statisticRoute);
 
+apiRoute.use('/course', authenticateMiddleware, userRolePermissionMiddleware([EUserRole.Admin]), courseRoute);
 export default apiRoute;
