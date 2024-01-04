@@ -39,7 +39,7 @@ const SelectionQuestion: React.FC<SelectionQuestionProps> = ({id, nameLesson, de
           </button> 
         </div>
         <AccordionDetails>
-          <div className='flex-col flex space-y-4 pr-7 pl-7 pb-7'>
+          <div className='flex-col flex space-y-4 md:pr-7 md:pl-7 md:pb-7'>
               <TextField
                 label="Câu hỏi"
                 name="title"
