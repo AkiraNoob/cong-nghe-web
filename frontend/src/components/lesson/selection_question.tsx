@@ -10,10 +10,11 @@ interface SelectionQuestionProps{
   textResultB: string,
   textResultC: string,
   textResultD: string,
+  clickDelete: () => void,
 }
 
 
-const SelectionQuestion: React.FC<SelectionQuestionProps> = ({id, nameLesson, descriptionLesson, textResultA, textResultB, textResultC, textResultD}) => {
+const SelectionQuestion: React.FC<SelectionQuestionProps> = ({id, nameLesson, descriptionLesson, textResultA, textResultB, textResultC, textResultD, clickDelete}) => {
 
   const [selectedValue, setSelectedValue] = React.useState('a');
 
@@ -33,7 +34,7 @@ const SelectionQuestion: React.FC<SelectionQuestionProps> = ({id, nameLesson, de
           >
             <Typography>Bài {id}</Typography>
           </AccordionSummary>
-          <button onClick={()=>{}}>
+          <button onClick={clickDelete}>
             <CancelIcon className='mr-3'></CancelIcon>
           </button> 
         </div>

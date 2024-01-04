@@ -3,12 +3,14 @@ import AddIcon from '@mui/icons-material/Add';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
+import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
+import SaveAltOutlinedIcon from '@mui/icons-material/SaveAltOutlined';
 import { AppBar, Button, ButtonProps, CardMedia, Dialog, Divider, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Toolbar, Typography } from '@mui/material';
 import Slide from '@mui/material/Slide';
 import { grey } from '@mui/material/colors';
 import { styled } from '@mui/material/styles';
 import { TransitionProps } from '@mui/material/transitions';
-import React, { ChangeEvent, useRef } from 'react';
+import React, { ChangeEvent, useRef, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import HeaderComponent from '~/components/header_component';
 import LessonOwner from '~/components/lesson/lesson_owner';
@@ -130,6 +132,37 @@ const CourseUpdateAdd: React.FC = () => {
     },
   ];
 
+  const dataQuestion = [
+    {
+      id: "1",
+      nameLesson: "Lesson 1",
+      descriptionLesson: "Introduction to JavaScript",
+      textResultA: "Option A",
+      textResultB: "Option B",
+      textResultC: "Option C",
+      textResultD: "Option D",
+    },
+    {
+      id: "2",
+      nameLesson: "Lesson 2",
+      descriptionLesson: "Introduction to JavaScript",
+      textResultA: "Option A",
+      textResultB: "Option B",
+      textResultC: "Option C",
+      textResultD: "Option D",
+    },
+    {
+      id: "3",
+      nameLesson: "Lesson 3",
+      descriptionLesson: "Introduction to JavaScript",
+      textResultA: "Option A",
+      textResultB: "Option B",
+      textResultC: "Option C",
+      textResultD: "Option D",
+    },
+  ]
+  const [dataQues, setDataQues] = useState(dataQuestion);
+
 
   // const [items, setItems] = useState<ListItem[]>(data2);
 
@@ -166,7 +199,7 @@ const CourseUpdateAdd: React.FC = () => {
                   {description}
                   </span>
               </div>
-              <ColorButton variant="contained" startIcon = {<EditIcon/>} onClick={handleClickOpen}>
+              <ColorButton variant="contained" startIcon = {<EditIcon/>} sx={{ textTransform: 'none' }} onClick={handleClickOpen}>
                   Chỉnh sửa tiêu đề khóa học
               </ColorButton>`
             </div>
@@ -176,7 +209,7 @@ const CourseUpdateAdd: React.FC = () => {
           </div>
           <div className='flex justify-between mt-10'>
             <h2 className=" text-1xl md:text-2xl font-bold mb-3">Nội dung khóa học</h2>
-            <ColorButton variant="contained" startIcon = {<AddIcon/>} onClick={()=>{}}>
+            <ColorButton variant="contained" startIcon = {<AddIcon/>} sx={{ textTransform: 'none' }} onClick={()=>{}}>
                Thêm bài giảng
             </ColorButton>
           </div>
@@ -248,31 +281,57 @@ const CourseUpdateAdd: React.FC = () => {
                 <Divider light />
                 {typeLesson === 'selection' && (
                   <div>
-                    A B C D ne
+                    <div className='space-y-4'>
+                      <TextField
+                        label="Số lượng câu hỏi"
+                        name="description"
+                        type='number'
+                        value={numQuestion}
+                        onChange={handleNumQuestionChange}
+                        multiline
+                        aria-readonly
+                      />
+                      <SelectionQuestion id='1' nameLesson='' descriptionLesson='' textResultA='' textResultB='' textResultC='' textResultD='' clickDelete={()=>{}}></SelectionQuestion>
+                      <div className='justify-center w-full flex'>
+                        <Button color="inherit" variant="outlined" startIcon = {<AddIcon/>} sx={{ textTransform: 'none' }}>
+                          Thêm câu hỏi
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 )}
 
                 {typeLesson === 'video' && (
-                  <div className='space-y-4'>
-                    <TextField
-                      label="Số lượng câu hỏi"
-                      name="description"
-                      type='number'
-                      value={numQuestion}
-                      onChange={handleNumQuestionChange}
-                      multiline
-                      required
-                    />
-                    <SelectionQuestion id='1' nameLesson='' descriptionLesson='' textResultA='' textResultB='' textResultC='' textResultD=''></SelectionQuestion>
-                  </div>
+                    <div className='space-y-5 text-sm text-gray-500'>
+                      <Button variant="outlined" startIcon = {<FileUploadOutlinedIcon/>} size='small' sx={{ textTransform: 'none' }} onClick={()=>{}}>
+                        Tải lên video bài giảng
+                      </Button>
+                      <div>
+                        <span>Tên video sau khi upload</span>
+                      </div>
+                      <Button variant="contained" size="small" onClick={()=>{}}>
+                          Lưu
+                      </Button>
+                    </div>
                 )}
 
                 {typeLesson === 'code script' && (
-                  <div>
-                    test case
+                  <div className='flex-col flex space-y-3 text-sm text-gray-500'>
+                    <span>Upload file json để tạo danh sách testcase cho bài giảng code script.</span>
+                    <span>File json phải có nội dung như file mẫu dưới đây.</span>
+                    <div className='flex-col space-y-3'>
+                      <Button startIcon = {<SaveAltOutlinedIcon/>} size='small' sx={{ textTransform: 'none' }} onClick={()=>{}}>Tải xuống mẫu test case</Button><br></br>
+                      <Button variant="outlined" startIcon = {<FileUploadOutlinedIcon/>} size='small' sx={{ textTransform: 'none' }} onClick={()=>{}}>Tải lên mẫu test case</Button>
+                    </div>
+                    <span>Tên file sau khi upload</span>
+                    <div>
+                      <Button variant="contained" size="small" onClick={()=>{}}>
+                        Lưu
+                      </Button>
+                    </div>
                   </div>
+                  
                 )}
-                
               </div>
             </div>
           </div>
