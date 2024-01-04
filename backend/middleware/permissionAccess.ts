@@ -3,7 +3,7 @@ import { EUserRole } from '../constant/enum/user.enum';
 import AppError from '../constant/error';
 import { EHttpStatus } from '../constant/statusCode';
 import { TUserMiddlewareParse } from '../types/api/auth.types';
-import { TCourseSchema } from '../types/schema/course.schema.types';
+import { TCourseDocument } from '../types/document.types';
 
 export const userRolePermissionMiddleware =
   (roleAccess: EUserRole[] = [EUserRole.Admin, EUserRole.Student]) =>
@@ -24,22 +24,8 @@ export const userRolePermissionMiddleware =
     return;
   };
 
-export const userJoinedCoursePermissionMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-  const _req = req as Request & { course: TCourseSchema };
-
-  const course = _req.course;
-
-  if (!course) {
-    const err = new AppError(EHttpStatus.INTERNAL_SERVER_ERROR, 'Not have course in req.');
-    res.status(err.statusCode).json({ data: null, message: err.message });
-    return;
+export const userJoinedCoursePermissionMiddleware = async (course: TCourseDocument, userId: string) => {
+  if (!course.participantsId.some((item) => item.userId === userId)) {
+    throw new AppError(EHttpStatus.FORBIDDEN, 'You have not joined this course.');
   }
-
-  if (!course.participantsId.some((item) => item.userId === (req.user as TUserMiddlewareParse).id)) {
-    const err = new AppError(EHttpStatus.FORBIDDEN, 'You have not joined this course.');
-    res.status(err.statusCode).json({ data: null, message: err.message });
-    return;
-  }
-
-  next();
 };
