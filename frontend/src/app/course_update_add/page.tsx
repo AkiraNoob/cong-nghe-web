@@ -213,11 +213,11 @@ const CourseUpdateAdd: React.FC = () => {
                Thêm bài giảng
             </ColorButton>
           </div>
-          <div className='flex mt-3'>
+          <div className='md:flex mt-3'>
             <DragDropContext onDragEnd={()=>{}}>
               <Droppable droppableId="list" >
                 {(provided) => (
-                  <div className="border-dashed border border-gray-100 w-1/4"
+                  <div className="border-dashed border border-gray-100 md:w-1/4 w-full"
                   ref={provided.innerRef} {...provided.droppableProps}>
                     {data2.map((item, index) => (
                       <Draggable key={item.id} draggableId={item.id} index={index}>
@@ -243,7 +243,7 @@ const CourseUpdateAdd: React.FC = () => {
                 )}
               </Droppable>
             </DragDropContext>
-            <div className='border-2 border-gray-300 w-3/4 rounded-2xl'>
+            <div className='border-2 border-gray-300 md:w-3/4 w-full rounded-2xl'>
               <div className='flex-col flex space-y-4 p-7'>
                 <TextField
                 label="Tiêu đề bài học"
@@ -261,7 +261,7 @@ const CourseUpdateAdd: React.FC = () => {
                   multiline
                   required
                 />
-                <div className='w-1/3'>
+                <div className='md:w-1/3 w-2/3'>
                   <FormControl fullWidth>
                     <InputLabel id="demo-simple-select-label" required>Loại bài giảng</InputLabel>
                     <Select
