@@ -4,13 +4,14 @@ import { EHttpStatus } from '../../constant/statusCode';
 import CourseModel from '../../models/course';
 import { TCoursePayload, TCourseById, TUpdateCourse } from '../../types/api/course.types';
 import { TCourseSchema } from '../../types/schema/course.schema.types';
+import { ECourseStatus } from '../../constant/enum/course.enum';
 
 const courseServices = {
   createCourse: async (req: Request) => {
     const reqBody = req.body as TCoursePayload;
-    await CourseModel.create(reqBody);
+    const course = await CourseModel.create(reqBody);
     return {
-      data: null,
+      data: course._id,
       statusCode: EHttpStatus.OK,
       message: 'Create course successfully',
     };
@@ -31,11 +32,14 @@ const courseServices = {
   },
   deleteCourseById: async (req: Request) => {
     const courseId = (req.params as TCourseById).courseId;
-    const course = await CourseModel.findByIdAndDelete({ _id: courseId });
+    const course = await CourseModel.findOne({ _id: courseId });
 
     if (!course) {
       throw new AppError(EHttpStatus.NOT_FOUND, 'Course not found');
     }
+
+    course.status = ECourseStatus.Hidden;
+    await course.save();
 
     return {
       data: course,
