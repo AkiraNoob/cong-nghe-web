@@ -51,6 +51,8 @@ const courseSchema = new Schema<TCourseDocument>(
   { timestamps: true },
 );
 
+courseSchema.index({ title: 'text' });
+
 const CourseModel = mongoose.model<TCourseDocument>('Courses', courseSchema, 'Courses');
 
 export default CourseModel;

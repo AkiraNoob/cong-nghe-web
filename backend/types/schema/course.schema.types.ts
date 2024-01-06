@@ -1,4 +1,4 @@
-import { Date } from 'mongoose';
+// import { Date } from 'mongoose';
 import { ECourseStatus } from '../../constant/enum/course.enum';
 
 export type TCourseSchema = {
