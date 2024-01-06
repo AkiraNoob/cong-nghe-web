@@ -7,12 +7,14 @@ import lessonRoute from './lesson/route';
 import statisticRoute from './statistic/route';
 import userRoute from './user/route';
 import userLessonRoute from './userLessons/route';
+import courseRoute from './course/route';
 const apiRoute = express.Router();
 
 apiRoute.use('/auth', authRoute);
 apiRoute.use('/user', authenticateMiddleware, userRoute);
 apiRoute.use('/lesson', authenticateMiddleware, userRolePermissionMiddleware([EUserRole.Admin]), lessonRoute);
 apiRoute.use('/user-lessons', authenticateMiddleware, userRolePermissionMiddleware(), userLessonRoute);
+apiRoute.use('/course', authenticateMiddleware, userRolePermissionMiddleware([EUserRole.Admin]), courseRoute);
 apiRoute.use('/statistic', authenticateMiddleware, userRolePermissionMiddleware(), statisticRoute);
 
 export default apiRoute;
