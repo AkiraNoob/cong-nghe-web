@@ -5,3 +5,6 @@ export type TUserAndCourseById = {
 export type TCourseTitle = {
   courseTitle: string;
 };
+export type TCourseId = {
+  courseId: string;
+};

@@ -10,6 +10,7 @@ const userController = {
     return userService.getUserByEmail(req.body as TGetUserDetailByEmail);
   }),
   getMe: tryCatchWrapper(async (req: Request) => await userService.getMe(req.user as TUserMiddlewareParse)),
+  updateProfileUser: tryCatchWrapper((req: Request) => userService.updateProfileUser(req)),
 };
 
 export default userController;

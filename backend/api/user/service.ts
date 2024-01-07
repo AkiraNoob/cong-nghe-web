@@ -1,4 +1,6 @@
 import AppError from '../../constant/error';
+import { bcryptCompareSync, bcryptHashSync } from '../../common/bcrypt';
+import { Request } from 'express';
 import { EHttpStatus } from '../../constant/statusCode';
 import UserModel from '../../models/user';
 import { TUserMiddlewareParse } from '../../types/api/auth.types';
@@ -53,6 +55,24 @@ const userService = {
     return {
       data: foundUser,
       statusCode: EHttpStatus.OK,
+    };
+  },
+  updateProfileUser: async (req: Request) => {
+    const userId = (req.params as TGetUserDetailById).userId;
+    const reqBody = req.body as TUserSchema;
+    if (reqBody.password) {
+      reqBody.password = bcryptHashSync(reqBody.password);
+    }
+    const user = await UserModel.findByIdAndUpdate({ _id: userId }, reqBody);
+
+    if (!user) {
+      throw new AppError(EHttpStatus.NOT_FOUND, 'course not found');
+    }
+
+    return {
+      data: user,
+      statusCode: EHttpStatus.OK,
+      message: 'Update user successfully',
     };
   },
 };

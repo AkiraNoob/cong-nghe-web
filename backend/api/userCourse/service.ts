@@ -2,7 +2,8 @@ import { Request } from 'express';
 import AppError from '../../constant/error';
 import { EHttpStatus } from '../../constant/statusCode';
 import CourseModel from '../../models/course';
-import { TCourseTitle, TUserAndCourseById } from '../../types/api/userCourse';
+import { TCourseId, TCourseTitle, TUserAndCourseById } from '../../types/api/userCourse';
+import UserModel from '../../models/user';
 // import { Date } from 'mongoose';
 const userCourseServices = {
   userJoinCourseById: async (req: Request) => {
@@ -10,7 +11,11 @@ const userCourseServices = {
     const userId = reqBody.userId;
     const courseId = reqBody.courseId;
     const course = await CourseModel.findById({ _id: courseId });
+    const user = await UserModel.findById({ _id: userId });
 
+    if (!user) {
+      throw new AppError(EHttpStatus.NOT_FOUND, 'User not found');
+    }
     if (!course) {
       throw new AppError(EHttpStatus.NOT_FOUND, 'Course not found');
     }
@@ -29,6 +34,10 @@ const userCourseServices = {
     };
     course.participantsId.push(userParticipation);
     await course.save();
+
+    user.participatedCourses.push(courseId);
+    await user.save();
+
     return {
       data: course,
       statusCode: EHttpStatus.OK,
@@ -40,7 +49,11 @@ const userCourseServices = {
     const userId = reqBody.userId;
     const courseId = reqBody.courseId;
     const course = await CourseModel.findById({ _id: courseId });
+    const user = await UserModel.findById({ _id: userId });
 
+    if (!user) {
+      throw new AppError(EHttpStatus.NOT_FOUND, 'User not found');
+    }
     if (!course) {
       throw new AppError(EHttpStatus.NOT_FOUND, 'Course not found');
     }
@@ -58,6 +71,21 @@ const userCourseServices = {
     course.participantsId.splice(participantIndex, 1);
 
     await course.save();
+    const participatedCourseIndex = user.participatedCourses.findIndex(
+      (participatedCourse) => participatedCourse == courseId,
+    );
+
+    if (participatedCourseIndex === -1) {
+      return {
+        data: null,
+        statusCode: EHttpStatus.BAD_REQUEST,
+        message: 'The user has not joined the course',
+      };
+    }
+
+    user.participatedCourses.splice(participatedCourseIndex, 1);
+    await user.save();
+
     return {
       data: course,
       statusCode: EHttpStatus.OK,
@@ -75,6 +103,28 @@ const userCourseServices = {
       data: courses,
       statusCode: EHttpStatus.OK,
       message: 'Search course successfully',
+    };
+  },
+
+  getCourseSuggestions: async (req: Request) => {
+    const { courseId } = req.params as TCourseId;
+    console.log('courseId: ', courseId);
+    const course = await CourseModel.findById({ _id: courseId }).select('label');
+
+    if (!course) {
+      throw new AppError(EHttpStatus.NOT_FOUND, 'Course not found');
+    }
+    const courseLabels = course.label;
+
+    const courses = await CourseModel.find({
+      label: { $in: courseLabels },
+      _id: { $ne: courseId },
+    }).select('_id title label');
+
+    return {
+      data: courses,
+      statusCode: EHttpStatus.OK,
+      message: 'get Course suggestions successfully',
     };
   },
 };

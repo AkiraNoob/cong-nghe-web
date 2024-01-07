@@ -21,7 +21,9 @@ const updateCourseObjectValidate = object({
   status: string().oneOf([ECourseStatus.Hidden, ECourseStatus.Publish]),
   label: array().of(string()).default([]),
   comments: array().of(string()).default([]),
-}) as ObjectSchema<TUpdateCourse>;
+})
+  .noUnknown(true)
+  .strict() as ObjectSchema<TUpdateCourse>;
 const CourseByIdObjectValidate: ObjectSchema<TCourseById> = object({
   courseId: string().required().trim(),
 })

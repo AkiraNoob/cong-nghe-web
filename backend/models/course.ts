@@ -52,6 +52,7 @@ const courseSchema = new Schema<TCourseDocument>(
 );
 
 courseSchema.index({ title: 'text' });
+courseSchema.index({ lable: 'text' });
 
 const CourseModel = mongoose.model<TCourseDocument>('Courses', courseSchema, 'Courses');
 

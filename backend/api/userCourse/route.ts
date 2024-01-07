@@ -19,4 +19,9 @@ userCourseRoute.get(
   (req, res, next) => userCourseValidator.validateSearchCourseTitle(req, res, next),
   (req, res, next) => userCourseControllers.searchCourseTitle(req, res, next),
 );
+userCourseRoute.get(
+  '/course-suggestions/:courseId',
+  (req, res, next) => userCourseValidator.validateCourseSuggestions(req, res, next),
+  (req, res, next) => userCourseControllers.getCourseSuggestions(req, res, next),
+);
 export default userCourseRoute;
