@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import routePath from '~/constant/routePath';
 import { TError } from '~/types/generic.types';
 
 const baseURL = process.env.API_DOMAIN;
@@ -22,10 +23,11 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (res) => {
     //auto map data
-    return res.data;
+    return res.data.data;
   },
   (error) => {
     const _err = error.response;
+
     return Promise.reject<TError>({
       statusCode: _err.status,
       message: _err.data.message,

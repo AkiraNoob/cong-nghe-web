@@ -1,14 +1,15 @@
 import { Request } from 'express';
+import { ELessonType } from '../../constant/enum/lesson.enum';
 import AppError from '../../constant/error';
 import { EHttpStatus } from '../../constant/statusCode';
-import LessonModel from '../../models/lesson';
-import { TLessonResource, TLessonSchema } from '../../types/schema/lesson.schema.types';
-import { TLessonById } from '../../types/api/lesson.types';
 import CourseModel from '../../models/course';
+import LessonModel from '../../models/lesson';
+import { TCreateLessonPayload, TLessonById } from '../../types/api/lesson.types';
+import { TLessonResource, TVideoLessonResourse } from '../../types/schema/lesson.schema.types';
 
 const lessonServices = {
   createLesson: async (req: Request) => {
-    const reqBody = req.body as TLessonSchema<TLessonResource>;
+    const reqBody = req.body as TCreateLessonPayload<TLessonResource>;
     const courseId = reqBody.courseId;
 
     const course = await CourseModel.findById({ _id: courseId });
@@ -17,7 +18,15 @@ const lessonServices = {
       throw new AppError(EHttpStatus.NOT_FOUND, 'Course not found');
     }
 
-    const createdLesson = await LessonModel.create(reqBody);
+    const createdLesson = await LessonModel.create({
+      ...reqBody,
+      type: req.query.type as ELessonType,
+      duration:
+        (req.query.type as ELessonType) === ELessonType.Video
+          ? parseInt((reqBody.resource as TVideoLessonResourse).duration)
+          : (reqBody.resource as unknown[]).length,
+      comments: [],
+    });
     const createdLessonId = createdLesson._id.toString();
 
     course.lessonIds.push(createdLessonId);
@@ -31,7 +40,7 @@ const lessonServices = {
   },
   getLessonById: async (req: Request) => {
     const lessonId = (req.params as TLessonById).lessonId;
-    const lesson = await LessonModel.findById({ _id: lessonId });
+    const lesson = await LessonModel.findById({ _id: lessonId }).select(['title', 'type', 'description', 'resource']);
 
     if (!lesson) {
       throw new AppError(EHttpStatus.NOT_FOUND, 'Lesson not found');
@@ -74,8 +83,8 @@ const lessonServices = {
   },
   updateLessonById: async (req: Request) => {
     const lessonId = (req.params as TLessonById).lessonId;
-    const reqBody = req.body as TLessonSchema<TLessonResource>;
-    console.log('data will be update', reqBody);
+    const reqBody = req.body as TCreateLessonPayload<TLessonResource>;
+
     const lesson = await LessonModel.findByIdAndUpdate({ _id: lessonId }, reqBody);
 
     if (!lesson) {

@@ -1,16 +1,18 @@
 import { ObjectSchema, array, object, string } from 'yup';
 import validateWrapper, { objectValidateOverride } from '../../common/validator';
 import { ECourseStatus } from '../../constant/enum/course.enum';
-import { TCourseById, TCoursePayload, TUpdateCourse } from '../../types/api/course.types';
+import { TCourseById, TCoursePayload, TGetCourseNavigatePayload, TUpdateCourse } from '../../types/api/course.types';
 
-const postCourseObjectValidate: ObjectSchema<TCoursePayload> = object({
+const postCourseObjectValidate: ObjectSchema<Omit<TCoursePayload, 'status'>> = object({
   title: string().required(),
   description: string().required(),
   cover: string().required(),
   lessonIds: array().of(string().required()).default([]),
-  status: string().oneOf([ECourseStatus.Hidden, ECourseStatus.Publish]).required(),
   label: array().of(string().required()).default([]),
-  comments: array().of(string().required()).default([]),
+});
+
+const getCourseNavigateValidateObject: ObjectSchema<TGetCourseNavigatePayload> = object({
+  courseId: string().required(),
 });
 
 const updateCourseObjectValidate = object({
@@ -20,8 +22,8 @@ const updateCourseObjectValidate = object({
   lessonIds: array().of(string()).default([]),
   status: string().oneOf([ECourseStatus.Hidden, ECourseStatus.Publish]),
   label: array().of(string()).default([]),
-  comments: array().of(string()).default([]),
 }) as ObjectSchema<TUpdateCourse>;
+
 const CourseByIdObjectValidate: ObjectSchema<TCourseById> = object({
   courseId: string().required().trim(),
 })
@@ -34,7 +36,9 @@ const courseValidator = {
   validateCourseById: validateWrapper((req) =>
     objectValidateOverride(CourseByIdObjectValidate, req.params as TCourseById),
   ),
-
+  vaidateGetCourseNavigate: validateWrapper((req) =>
+    objectValidateOverride(getCourseNavigateValidateObject, req.params as TGetCourseNavigatePayload),
+  ),
   validateUpdateCourseById: validateWrapper((req) =>
     objectValidateOverride(updateCourseObjectValidate, req.body as TUpdateCourse),
   ),

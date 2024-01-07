@@ -8,6 +8,7 @@ export type TUserResponseBasicData = {
   avatar: string;
   participatedCourses: string[];
   learningLessons: string[];
+  id: string;
 };
 export const getUserDetailById = (id: string) => httpRequest.get<TUserResponseBasicData>(`/user/${id}`);
 

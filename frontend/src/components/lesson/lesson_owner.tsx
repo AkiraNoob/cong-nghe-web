@@ -1,11 +1,12 @@
 import { Checklist, Code, Menu, PlayCircle } from '@mui/icons-material';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import { ELessonType } from '~/constant/enum/lesson.enum';
 interface LessonOwnerProps {
   id: string;
   name: string;
   quantity: string;
   exerciseType: string;
-  isChoose: boolean
+  isChoose?: boolean;
 }
 const LessonOwner: React.FC<LessonOwnerProps> = ({ id, name, quantity, exerciseType, isChoose }) => {
   let exerciseIcon;
@@ -25,21 +26,23 @@ const LessonOwner: React.FC<LessonOwnerProps> = ({ id, name, quantity, exerciseT
       break;
   }
   return (
-    <div className='flex items-center'>
+    <div className="flex items-center">
       <Menu></Menu>
-      <div className={isChoose ? ' bg-gray-200 rounded-2xl w-full ml-3 space-y-4' : 'rounded-2xl w-full ml-3 space-y-4'}>
-        <div className='p-2'>
+      <div
+        className={isChoose ? ' bg-gray-200 rounded-2xl w-full ml-3 space-y-4' : 'rounded-2xl w-full ml-3 space-y-4'}
+      >
+        <div className="p-2">
           <div className="flex flex-row place-items-cent items-center">
             {exerciseIcon}
             <p className="px-2">{name}</p>
           </div>
-          <div className="ml-auto flex items-center">
-              <span>{quantity}</span>
+          <div className="ml-auto mt-2 flex items-center">
+            <span className="text-sm">{exerciseType === ELessonType.Video ? `${quantity}` : ` ${quantity} câu`}</span>
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default LessonOwner;

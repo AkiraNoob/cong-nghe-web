@@ -3,7 +3,7 @@ import { EUserRole } from '../constant/enum/user.enum';
 import AppError from '../constant/error';
 import { EHttpStatus } from '../constant/statusCode';
 import { TUserMiddlewareParse } from '../types/api/auth.types';
-import { TCourseDocument } from '../types/document.types';
+import { TCommentsDocument, TCourseDocument } from '../types/document.types';
 
 export const userRolePermissionMiddleware =
   (roleAccess: EUserRole[] = [EUserRole.Admin, EUserRole.Student]) =>
@@ -27,5 +27,12 @@ export const userRolePermissionMiddleware =
 export const userJoinedCoursePermissionMiddleware = async (course: TCourseDocument, userId: string) => {
   if (!course.participantsId.some((item) => item.userId === userId)) {
     throw new AppError(EHttpStatus.FORBIDDEN, 'You have not joined this course.');
+  }
+};
+
+export const userIsOwnerOfCommentMiddleware = async (req: Request, comment: TCommentsDocument) => {
+  const user = req.user as TUserMiddlewareParse;
+  if (comment.userId !== user.id) {
+    throw new AppError(EHttpStatus.FORBIDDEN, 'You is not owner of this comment');
   }
 };

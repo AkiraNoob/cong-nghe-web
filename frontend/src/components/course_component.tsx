@@ -2,27 +2,38 @@
 import { People } from '@mui/icons-material';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { Card, CardMedia, ListItemIcon, MenuItem, Rating } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import React from 'react';
+import routePath from '~/constant/routePath';
+import { generatePathname } from '~/helper/generatePathname';
 interface CourseComponentProps {
   id: string;
   image: string;
   name: string;
   date: string;
   views: number;
-  rating: number;
 }
-const CourseComponent: React.FC<CourseComponentProps> = ({ image, name, date, views, rating }) => {
-  const onClickCourse = () => {};
+const CourseComponent: React.FC<CourseComponentProps> = ({ id, image, name, date, views }) => {
+  const router = useRouter();
+  const onClickCourse = () => {
+    router.push(
+      generatePathname({
+        pathName: routePath.COURSE_DETAIL,
+        query: {
+          courseId: id,
+        },
+      }),
+    );
+  };
 
   return (
     <div className="relative rounded-2xl" onClick={onClickCourse}>
       <Card>
-        <CardMedia sx={{ height: 200 }} image={image} title="green iguana"></CardMedia>
+        <CardMedia sx={{ height: 200 }} image={image} title="green iguana" />
         <div className="rounded-tr pt-2 pl-3 pr-3">
-          <Rating size="small" name="star-rating" defaultValue={0} precision={0.5} max={5} value={rating} />
           <h1 className="font-bold">{name}</h1>
         </div>
-        <div className="flex">
+        <div className="flex flex-wrap">
           <MenuItem>
             <ListItemIcon>
               <People fontSize="small" />
@@ -32,7 +43,7 @@ const CourseComponent: React.FC<CourseComponentProps> = ({ image, name, date, vi
           <MenuItem>
             <ListItemIcon>
               <CalendarMonthIcon fontSize="small" />
-              <span className="text-sm ml-1">Ngày tạo: {date}</span>
+              <span className="text-sm ml-1">Ngày tạo: {date && new Date(date).toLocaleDateString()}</span>
             </ListItemIcon>
           </MenuItem>
         </div>

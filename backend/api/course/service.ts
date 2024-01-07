@@ -1,31 +1,123 @@
 import { Request } from 'express';
+import { ECourseStatus } from '../../constant/enum/course.enum';
+import { EUserLessonStatus } from '../../constant/enum/lesson.enum';
 import AppError from '../../constant/error';
 import { EHttpStatus } from '../../constant/statusCode';
+import { courseExistsMiddleware } from '../../middleware/exists';
 import CourseModel from '../../models/course';
-import { TCoursePayload, TCourseById, TUpdateCourse } from '../../types/api/course.types';
+import LessonModel from '../../models/lesson';
+import UserLessonModel from '../../models/userLessons';
+import { TUserMiddlewareParse } from '../../types/api/auth.types';
+import {
+  TCourseById,
+  TCoursePayload,
+  TGetCourseByIdResponse,
+  TGetCourseNavigatePayload,
+  TGetCourseNavigateResponse,
+} from '../../types/api/course.types';
+import { TServiceResponseType } from '../../types/general.types';
 import { TCourseSchema } from '../../types/schema/course.schema.types';
-import { ECourseStatus } from '../../constant/enum/course.enum';
 
 const courseServices = {
+  changeStatus: async (req: Request): Promise<TServiceResponseType<null>> => {
+    const course = await courseExistsMiddleware(req);
+    course.status = course.status == ECourseStatus.Hidden ? ECourseStatus.Publish : ECourseStatus.Hidden;
+    await course.save();
+
+    return {
+      data: null,
+      statusCode: EHttpStatus.OK,
+      message: 'Change status successfully',
+    };
+  },
+  getCourseNavigate: async (req: Request): Promise<TServiceResponseType<TGetCourseNavigateResponse>> => {
+    const reqBody = req.params as TGetCourseNavigatePayload;
+
+    const lessons = await LessonModel.find({ courseId: reqBody.courseId }).select(['title', 'type']);
+
+    return {
+      data: {
+        lessons,
+      },
+      statusCode: EHttpStatus.OK,
+      message: 'Get course navigate successfully',
+    };
+  },
+  getAllCourse: async () => {
+    const courses = await CourseModel.find({}, {}, { timestamps: true })
+      .select(['title', 'description', 'cover', 'participantsId', 'createdAt'])
+      .then((item) =>
+        item.map((course) => ({
+          _id: course._id,
+          title: course.title,
+          description: course.description,
+          cover: course.cover,
+          createdAt: course.createdAt,
+          totalJoined: course.participantsId.length || 0,
+        })),
+      );
+
+    return {
+      data: courses,
+      statusCode: EHttpStatus.OK,
+      message: 'Get courses successfully',
+    };
+  },
   createCourse: async (req: Request) => {
     const reqBody = req.body as TCoursePayload;
-    const course = await CourseModel.create(reqBody);
+    const course = await CourseModel.create({
+      ...reqBody,
+      rating: 0,
+      participantsId: [],
+      comments: [],
+      status: ECourseStatus.Hidden,
+    });
     return {
       data: course._id,
       statusCode: EHttpStatus.OK,
       message: 'Create course successfully',
     };
   },
-  getCourseById: async (req: Request) => {
+  getCourseById: async (req: Request): Promise<TServiceResponseType<TGetCourseByIdResponse>> => {
     const courseId = (req.params as TCourseById).courseId;
-    const course = await CourseModel.findById({ _id: courseId });
+    const course = await CourseModel.findById({ _id: courseId }).select([
+      'title',
+      'cover',
+      'description',
+      'participantsId',
+    ]);
 
     if (!course) {
       throw new AppError(EHttpStatus.NOT_FOUND, 'Course not found');
     }
 
+    const lessons = await LessonModel.find({ courseId }).select(['title', 'type', 'duration', '_id']);
+
+    const concurrentPromise = lessons.map((lesson) =>
+      UserLessonModel.findOne({ lessonId: lesson._id, courseId, userId: (req.user as TUserMiddlewareParse).id })
+        .select('status')
+        .then((item) => ({
+          _id: lesson?._id,
+          status: item?.status || EUserLessonStatus.Pending,
+          title: lesson.title,
+          type: lesson.type,
+          duration: lesson.duration,
+        })),
+    );
+
+    const lessonWithUserStatus = await Promise.all(concurrentPromise);
+
     return {
-      data: course,
+      data: {
+        cover: course.cover,
+        title: course.title,
+        description: course.description,
+        totalJoined: course.participantsId.length,
+        lessons: lessonWithUserStatus,
+        isCurrentUserJoined: course.participantsId.some(
+          (item) => item.userId === (req.user as TUserMiddlewareParse).id,
+        ),
+      },
       statusCode: EHttpStatus.OK,
       message: 'Get Course successfully',
     };
@@ -50,7 +142,6 @@ const courseServices = {
   updateCourseById: async (req: Request) => {
     const courseId = (req.params as TCourseById).courseId;
     const reqBody = req.body as TCourseSchema;
-    console.log('data will be update', reqBody);
     const course = await CourseModel.findByIdAndUpdate({ _id: courseId }, reqBody);
 
     if (!course) {

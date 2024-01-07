@@ -7,6 +7,9 @@ const courseControllers = {
   getCourseById: tryCatchWrapper((req: Request) => courseServices.getCourseById(req)),
   deleteCourseById: tryCatchWrapper((req: Request) => courseServices.deleteCourseById(req)),
   updateCourseById: tryCatchWrapper((req: Request) => courseServices.updateCourseById(req)),
+  getAllCourses: tryCatchWrapper(() => courseServices.getAllCourse()),
+  getCourseNavigate: tryCatchWrapper((req) => courseServices.getCourseNavigate(req)),
+  changeStatus: tryCatchWrapper((req) => courseServices.changeStatus(req)),
 };
 
 export default courseControllers;
