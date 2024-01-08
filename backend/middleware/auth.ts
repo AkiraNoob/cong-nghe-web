@@ -20,3 +20,17 @@ const authenticateMiddleware = (req: Request, res: Response, next: NextFunction)
 };
 
 export default authenticateMiddleware;
+
+export const nonStrictAuthenticateMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  passport.use(generateJWTStrategy());
+  passport.authenticate('jwt', { session: false }, (err: Error, user: TUserMiddlewareParse) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return next();
+    }
+    req.user = user;
+    return next();
+  })(req, res, next);
+};

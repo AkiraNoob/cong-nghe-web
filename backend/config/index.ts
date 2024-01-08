@@ -13,6 +13,11 @@ const config = {
   },
   port: process.env.PORT || 3000,
   JWTAlgorithm: 'HS256' as Algorithm,
+  cloudinary: {
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+    CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
+  },
 };
 
 export default config;

@@ -1,4 +1,5 @@
 import mongoose, { Document } from 'mongoose';
+import { TCommentSchema } from './schema/comment.schema.types';
 import { TCourseSchema } from './schema/course.schema.types';
 import { TLessonResource, TLessonSchema } from './schema/lesson.schema.types';
 import { TUserSchema } from './schema/user.schema.types';
@@ -15,3 +16,4 @@ export type TCourseDocument = TDocument<TCourseSchema>;
 export type TLessonDocument = TDocument<TLessonSchema<TLessonResource>>;
 export type TUserDocument = TDocument<TUserSchema>;
 export type TUserLessonDocument = TDocument<TUserLessonSchema>;
+export type TCommentsDocument = TDocument<TCommentSchema>;

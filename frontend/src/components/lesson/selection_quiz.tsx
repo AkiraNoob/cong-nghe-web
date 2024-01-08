@@ -2,30 +2,23 @@
 
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Button, IconButton } from '@mui/material';
-import { useState } from 'react';
-import { ESelectionAnswerChoiceList } from '~/constant/enum/lesson.enum';
+import { Button, IconButton, Skeleton } from '@mui/material';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { ELessonType, ESelectionAnswerChoiceList } from '~/constant/enum/lesson.enum';
 import deepClone from '~/helper/deepClone';
-import { useSubmitSelectionLessonResult } from '~/hooks/userLessons.ts/useSubmitUserLessons';
+import useGetUserLessons, { useRefetchGetUserLessons } from '~/hooks/userLessons/useGetUserLessons';
+import { useSubmitSelectionLessonResult } from '~/hooks/userLessons/useSubmitUserLessons';
+import { TUserSelectionLessonCheckpoint } from '~/types/api/userLesson.types';
+import LoadingButtonProvider from '../loading_button';
 
-export type TSelectionQuiz =
-  | {
-      mode: 'take';
-      checkPoints?: never;
-    }
-  | {
-      mode: 'review';
-      checkPoints: {
-        choosenAsnwer: ESelectionAnswerChoiceList;
-        isCorrect: boolean;
-        correctAnswer: ESelectionAnswerChoiceList;
-      }[];
-    };
+export type TSelectionQuiz = {
+  mode: 'take' | 'review';
+};
 
 export default function SelectionQuiz({
   questtionList,
-  mode,
-  checkPoints,
+  mode: _mode,
 }: TSelectionQuiz & {
   questtionList: {
     question: string;
@@ -36,90 +29,143 @@ export default function SelectionQuiz({
     answerD: string;
   }[];
 }) {
+  const { courseId, lessonId } = useParams();
+  const { data: previousResult, isSuccess } = useGetUserLessons(
+    courseId as string,
+    lessonId as string,
+    ELessonType.Selection,
+  );
+  const { refetch } = useRefetchGetUserLessons(courseId as string, lessonId as string, ELessonType.Selection);
+
+  const checkPoints = !!previousResult ? (previousResult.checkpoint as TUserSelectionLessonCheckpoint[]) : [];
+
+  const [mode, setMode] = useState(_mode);
+
+  useEffect(() => {
+    if (previousResult) {
+      setMode('review');
+      return;
+    }
+    setMode('take');
+  }, [, previousResult]);
+
   const totalQuestion = questtionList.length;
 
   const [currentQues, setCurrentQues] = useState<number>(0);
   const [selectAnswerForEachQuestion, setSelectAnswerForEachQuestion] = useState<
     Array<ESelectionAnswerChoiceList | null>
   >(new Array(totalQuestion).fill(null));
-  const { mutate } = useSubmitSelectionLessonResult();
 
-  return (
-    <div className="space-y-[20px] text-black">
-      <div className="flex flex-col gap-[20px] items-center">
-        <div className="flex gap-[30px] items-center justify-center">
-          <div className="p-1">
-            <IconButton onClick={() => setCurrentQues((prev) => (prev - 1 < 0 ? 0 : prev - 1))}>
-              <ChevronLeftIcon fontSize="large" />
-            </IconButton>
-          </div>
-          <p className="text-2xl font-medium">
-            Câu: <span className="underline">{currentQues + 1}</span> /<span>{totalQuestion}</span>
-          </p>
-          <div className="p-1">
-            <IconButton onClick={() => setCurrentQues((prev) => (prev + 1 >= totalQuestion ? prev : prev + 1))}>
-              <ChevronRightIcon fontSize="large" />
-            </IconButton>
-          </div>
-        </div>
-        <Button
-          onClick={() =>
-            mutate(
-              selectAnswerForEachQuestion.map((choosenAnswer) => ({
-                choosenAnswer: null,
-              })),
-            )
-          }
-          variant="contained"
-          className="!w-fit"
-        >
-          Nộp bài
-        </Button>
-      </div>
+  const { mutate, isPending } = useSubmitSelectionLessonResult({
+    onSuccess(data, variables, context) {
+      refetch();
+      setSelectAnswerForEachQuestion(new Array(totalQuestion).fill(null));
+      setCurrentQues(0);
+    },
+  });
 
-      <p>
-        <strong>Câu {currentQues + 1}:</strong> {questtionList[currentQues].question}
-      </p>
-      <div className="flex justify-between flex-col lg:flex-row gap-[20px]">
-        <div className="flex-1 text-base px-6">
-          {mode === 'review' && (
-            <>
-              <p className="font-semibold">Giải thích: </p>
-              <p className="font-normal">{questtionList[currentQues].explanation}</p>
-            </>
+  if (isSuccess && previousResult !== undefined) {
+    return (
+      <div className="space-y-[20px] text-black">
+        <div className="flex flex-col gap-[20px] items-center">
+          <div className="flex gap-[30px] items-center justify-center">
+            <div className="p-1">
+              <IconButton onClick={() => setCurrentQues((prev) => (prev - 1 < 0 ? 0 : prev - 1))}>
+                <ChevronLeftIcon fontSize="large" />
+              </IconButton>
+            </div>
+            <p className="text-2xl font-medium">
+              Câu: <span className="underline">{currentQues + 1}</span> /<span>{totalQuestion}</span>
+            </p>
+            <div className="p-1">
+              <IconButton onClick={() => setCurrentQues((prev) => (prev + 1 >= totalQuestion ? prev : prev + 1))}>
+                <ChevronRightIcon fontSize="large" />
+              </IconButton>
+            </div>
+          </div>
+          {mode === 'take' ? (
+            <LoadingButtonProvider isLoading={isPending}>
+              <Button
+                onClick={() =>
+                  mutate(
+                    selectAnswerForEachQuestion.map((choosenAnswer) => ({
+                      choosenAnswer,
+                    })),
+                  )
+                }
+                disabled={!selectAnswerForEachQuestion.every((item) => !!item)}
+                variant="contained"
+                className="!w-fit"
+              >
+                Nộp bài
+              </Button>
+            </LoadingButtonProvider>
+          ) : (
+            <Button onClick={() => setMode('take')} variant="contained" className="!w-fit">
+              Làm lại
+            </Button>
           )}
         </div>
-        <div className={`space-y-[30px] flex-1 ${mode === 'take' && 'cursor-pointer'}`}>
-          {Object.values(ESelectionAnswerChoiceList).map((answer) => {
-            const hashAnswerConttent: { [keys in ESelectionAnswerChoiceList]: string } = {
-              [ESelectionAnswerChoiceList.A]: questtionList[currentQues].answerA,
-              [ESelectionAnswerChoiceList.B]: questtionList[currentQues].answerB,
-              [ESelectionAnswerChoiceList.C]: questtionList[currentQues].answerC,
-              [ESelectionAnswerChoiceList.D]: questtionList[currentQues].answerD,
-            };
-            return (
-              <SelectionQuizAnswer
-                key={answer}
-                setSelectAnswerForEachQuestion={() => {
-                  setSelectAnswerForEachQuestion((prev) => {
-                    const clone = deepClone(prev);
-                    clone[currentQues] = answer;
-                    return clone;
-                  });
-                }}
-                answer={answer}
-                mode={mode}
-                content={hashAnswerConttent[answer]}
-                isSelect={
-                  answer ===
-                  (mode === 'take'
-                    ? selectAnswerForEachQuestion[currentQues]
-                    : checkPoints?.[currentQues].choosenAsnwer)
-                }
-                correctAnswer={checkPoints?.[currentQues].correctAnswer}
-              />
-            );
-          })}
+
+        <p>
+          <strong>Câu {currentQues + 1}:</strong> {questtionList[currentQues].question}
+        </p>
+        <div className="flex justify-between flex-col lg:flex-row gap-[20px]">
+          <div className="flex-1 text-base px-6">
+            {mode === 'review' && (
+              <>
+                <p className="font-semibold">Giải thích: </p>
+                <p className="font-normal">{questtionList[currentQues].explanation}</p>
+              </>
+            )}
+          </div>
+          <div className={`space-y-[30px] flex-1 ${mode === 'take' && 'cursor-pointer'}`}>
+            {Object.values(ESelectionAnswerChoiceList).map((answer) => {
+              const hashAnswerConttent: { [keys in ESelectionAnswerChoiceList]: string } = {
+                [ESelectionAnswerChoiceList.A]: questtionList[currentQues].answerA,
+                [ESelectionAnswerChoiceList.B]: questtionList[currentQues].answerB,
+                [ESelectionAnswerChoiceList.C]: questtionList[currentQues].answerC,
+                [ESelectionAnswerChoiceList.D]: questtionList[currentQues].answerD,
+              };
+              return (
+                <SelectionQuizAnswer
+                  key={answer}
+                  setSelectAnswerForEachQuestion={() => {
+                    setSelectAnswerForEachQuestion((prev) => {
+                      const clone = deepClone(prev);
+                      clone[currentQues] = answer;
+                      return clone;
+                    });
+                  }}
+                  answer={answer}
+                  mode={mode}
+                  content={hashAnswerConttent[answer]}
+                  isSelect={
+                    answer ===
+                    (mode === 'take'
+                      ? selectAnswerForEachQuestion[currentQues]
+                      : checkPoints?.[currentQues]?.choosenAnswer)
+                  }
+                  correctAnswer={checkPoints?.[currentQues]?.correctAnswer}
+                />
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <Skeleton variant="rounded" width={200} height={60} className="mx-auto mb-3" />
+      <div className="flex gap-4">
+        <Skeleton variant="rounded" width={'auto'} className="flex-1" height={60} />
+        <div className="flex-1">
+          <Skeleton variant="rounded" width={'100%'} height={40} />
+          <Skeleton variant="rounded" width={'100%'} height={40} />
+          <Skeleton variant="rounded" width={'100%'} height={40} />
+          <Skeleton variant="rounded" width={'100%'} height={40} />
         </div>
       </div>
     </div>
@@ -170,11 +216,11 @@ function SelectionQuizAnswer({
     <div
       onClick={mode === 'take' ? setSelectAnswerForEachQuestion : undefined}
       key={answer}
-      className="flex gap-[20px] items-center w-fit group ease-in-out transition-all"
+      className="flex gap-[20px] items-center w-full group ease-in-out transition-all"
     >
       <p>{answer.toUpperCase()}.</p>
       <div
-        className={`${backgroundColor}} text-textMain group-hover:border-backgroundMain border border-solid border-[#79747E] p-[10px_24px] ease-in-out transition-all rounded-lg`}
+        className={`${backgroundColor} w-full text-textMain group-hover:border-backgroundMain border border-solid border-[#79747E] p-[10px_24px] ease-in-out transition-all rounded-lg`}
       >
         <span>{content}</span>
       </div>

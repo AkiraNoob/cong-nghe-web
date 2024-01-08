@@ -1,5 +1,7 @@
 import express from 'express';
 import { ELessonType } from '../../constant/enum/lesson.enum';
+import { EUserRole } from '../../constant/enum/user.enum';
+import { userRolePermissionMiddleware } from '../../middleware/permissionAccess';
 import lessonController from './controller';
 import lessonValidator from './validator';
 
@@ -36,14 +38,21 @@ const updateLesson = {
 };
 lessonRoute.post(
   '/create-lesson',
+  userRolePermissionMiddleware([EUserRole.Admin]),
   lessonValidator.validateLessonResultQuery,
   (req, res, next) => createLesson[req.query.type as ELessonType].validator(req, res, next),
   (req, res, next) => createLesson[req.query.type as ELessonType].controller(req, res, next),
 );
 lessonRoute.get('/:lessonId', lessonValidator.validateLessonById, lessonController.getLessonById);
-lessonRoute.delete('/:lessonId', lessonValidator.validateLessonById, lessonController.deleteLessonById);
+lessonRoute.delete(
+  '/:lessonId',
+  userRolePermissionMiddleware([EUserRole.Admin]),
+  lessonValidator.validateLessonById,
+  lessonController.deleteLessonById,
+);
 lessonRoute.put(
   '/:lessonId',
+  userRolePermissionMiddleware([EUserRole.Admin]),
   lessonValidator.validateLessonById,
   (req, res, next) => updateLesson[req.query.type as ELessonType].validator(req, res, next),
   (req, res, next) => updateLesson[req.query.type as ELessonType].controller(req, res, next),

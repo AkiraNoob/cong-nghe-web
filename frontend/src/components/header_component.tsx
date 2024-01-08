@@ -1,5 +1,5 @@
 'use client';
-import { Login, Logout, PersonAdd, Settings } from '@mui/icons-material';
+import { Logout, Settings } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
@@ -15,7 +15,7 @@ import useLogout from '~/hooks/auth/useLogout';
 import SearchComponent from './search_component';
 
 const HeaderComponent: React.FC = () => {
-  const { isLogin: auth } = useContext(userContext);
+  const { isLogin: auth, data } = useContext(userContext);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -36,29 +36,29 @@ const HeaderComponent: React.FC = () => {
     // Xử lý logic tìm kiếm dựa trên query
     console.log('Perform search with query:', query);
   };
+
   return (
     <div className="flex items-center bg-white border-b-2 border-gray-200 sticky top-0 z-20 h-20">
-      <div className="items-center w-1/6 flex sm:ml-10 ml-3 sm:w-1/3">
-        {/* <img src='/images/CodePro.png' className='rounded-sm h-10 w-10'>
-        </img> */}
-        <Image src={'/images/CodePro.png'} width={40} height={40} alt="Logo"></Image>
-        <Typography
-          variant="h6"
-          noWrap
-          component="a"
-          sx={{
-            mr: 2,
-            display: { xs: 'none', md: 'flex' },
-            fontFamily: 'monospace',
-            fontWeight: 700,
-            letterSpacing: '.3rem',
-            color: 'inherit',
-            textDecoration: 'none',
-            marginLeft: 4,
-          }}
-        >
-          CODEPRO
-        </Typography>
+      <div className="w-1/6 sm:ml-10 ml-3 sm:w-1/3">
+        <Link className="items-center flex w-fit" href={'/'}>
+          <Image src={'/images/CodePro.png'} width={40} height={40} alt="Logo" className="rounded-full" />
+          <Typography
+            variant="h6"
+            noWrap
+            sx={{
+              mr: 2,
+              display: { xs: 'none', md: 'flex' },
+              fontFamily: 'monospace',
+              fontWeight: 700,
+              letterSpacing: '.3rem',
+              color: 'inherit',
+              textDecoration: 'none',
+              marginLeft: 4,
+            }}
+          >
+            CODEPRO
+          </Typography>
+        </Link>
       </div>
       <div className="w-4/6 sm:w-1/3">
         <SearchComponent></SearchComponent>
@@ -68,7 +68,7 @@ const HeaderComponent: React.FC = () => {
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Tooltip title="Open profile">
               <IconButton onClick={handleClick} sx={{ p: 0, justifyContent: 'flex-end' }}>
-                <Avatar alt="Remy Sharp" src="/images/avatar.jpeg" />
+                <Avatar alt="Remy Sharp" src={data ? data.avatar : '/images/avatar.jpeg'} />
               </IconButton>
             </Tooltip>
             <Menu
@@ -152,29 +152,31 @@ const HeaderComponent: React.FC = () => {
                   open={open}
                   onClose={handleClose}
                   onClick={handleClose}
-                  PaperProps={{
-                    elevation: 0,
-                    sx: {
-                      overflow: 'visible',
-                      filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                      mt: 1.5,
-                      '& .MuiAvatar-root': {
-                        width: 32,
-                        height: 32,
-                        ml: -0.5,
-                        mr: 1,
-                      },
-                      '&:before': {
-                        content: '""',
-                        display: 'block',
-                        position: 'absolute',
-                        top: 0,
-                        right: 14,
-                        width: 10,
-                        height: 10,
-                        bgcolor: 'background.paper',
-                        transform: 'translateY(-50%) rotate(45deg)',
-                        zIndex: 0,
+                  slotProps={{
+                    paper: {
+                      elevation: 0,
+                      sx: {
+                        overflow: 'visible',
+                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                        mt: 1.5,
+                        '& .MuiAvatar-root': {
+                          width: 32,
+                          height: 32,
+                          ml: -0.5,
+                          mr: 1,
+                        },
+                        '&:before': {
+                          content: '""',
+                          display: 'block',
+                          position: 'absolute',
+                          top: 0,
+                          right: 14,
+                          width: 10,
+                          height: 10,
+                          bgcolor: 'background.paper',
+                          transform: 'translateY(-50%) rotate(45deg)',
+                          zIndex: 0,
+                        },
                       },
                     },
                   }}
@@ -182,20 +184,10 @@ const HeaderComponent: React.FC = () => {
                   anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
                   <Link href="/register" className="font-medium hover:underline ">
-                    <MenuItem onClick={handleClose}>
-                      <ListItemIcon>
-                        <PersonAdd fontSize="small" />
-                      </ListItemIcon>
-                      Đăng ký
-                    </MenuItem>
+                    <MenuItem onClick={handleClose}>Đăng ký</MenuItem>
                   </Link>
                   <Link href="/login" className="font-medium hover:underline ">
-                    <MenuItem onClick={handleClose}>
-                      <ListItemIcon>
-                        <Login fontSize="small" />
-                      </ListItemIcon>
-                      Đăng nhập
-                    </MenuItem>
+                    <MenuItem onClick={handleClose}>Đăng nhập</MenuItem>
                   </Link>
                 </Menu>
               </Box>
