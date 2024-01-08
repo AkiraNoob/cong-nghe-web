@@ -1,7 +1,6 @@
 'use client';
 
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ThumbDownAlt from '@mui/icons-material/ThumbDownAlt';
 import ThumbDownAltOutlined from '@mui/icons-material/ThumbDownAltOutlined';
@@ -93,12 +92,12 @@ const CommentInteraction = ({
         </LoadingButtonProvider>
         <span>{numberOfDislikes}</span>
       </div>
-      <div className="flex items-center gap-1">
+      {/* <div className="flex items-center gap-1">
         <IconButton disabled={!isLogin}>
           <ForumOutlinedIcon />
         </IconButton>
         <span>{numberOfReplies}</span>
-      </div>
+      </div> */}
     </div>
   );
 };
