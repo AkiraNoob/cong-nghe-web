@@ -1,10 +1,16 @@
-import AppError from '../../constant/error';
-import { bcryptCompareSync, bcryptHashSync } from '../../common/bcrypt';
 import { Request } from 'express';
+import { bcryptHashSync } from '../../common/bcrypt';
+import AppError from '../../constant/error';
+import { PASSWORD_REGEX } from '../../constant/regex';
 import { EHttpStatus } from '../../constant/statusCode';
 import UserModel from '../../models/user';
 import { TUserMiddlewareParse } from '../../types/api/auth.types';
-import { TGetUserDetailByEmail, TGetUserDetailById, TGetUserDetailDataResponse } from '../../types/api/user.types';
+import {
+  TGetUserDetailByEmail,
+  TGetUserDetailById,
+  TGetUserDetailDataResponse,
+  TUpdateProfileUser,
+} from '../../types/api/user.types';
 import { TServiceResponseType } from '../../types/general.types';
 import { TUserSchema } from '../../types/schema/user.schema.types';
 
@@ -58,16 +64,26 @@ const userService = {
     };
   },
   updateProfileUser: async (req: Request) => {
-    const userId = (req.params as TGetUserDetailById).userId;
-    const reqBody = req.body as TUserSchema;
+    const reqBody = req.body as TUpdateProfileUser;
+    const reqUser = req.user as TUserMiddlewareParse;
+
     if (reqBody.password) {
+      if (!PASSWORD_REGEX.test(reqBody.password)) {
+        throw new AppError(EHttpStatus.BAD_REQUEST, 'Password format is invalid.');
+      }
+
       reqBody.password = bcryptHashSync(reqBody.password);
     }
-    const user = await UserModel.findByIdAndUpdate({ _id: userId }, reqBody);
+    const user = await UserModel.findById(reqUser.id);
 
     if (!user) {
-      throw new AppError(EHttpStatus.NOT_FOUND, 'course not found');
+      throw new AppError(EHttpStatus.NOT_FOUND, 'user not found');
     }
+
+    user.avatar = reqBody.avatar || user.avatar;
+    (user.fullName = reqBody.fullName || user.fullName), (user.password = reqBody.password || user.password);
+
+    await user.save();
 
     return {
       data: user,

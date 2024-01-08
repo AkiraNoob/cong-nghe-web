@@ -41,7 +41,7 @@ commentRoute.put(
 );
 
 commentRoute.delete(
-  '/',
+  '/:commentId',
   authenticateMiddleware,
   commentValidator.validateDeleteComment,
   commentController.deleteCommentById,

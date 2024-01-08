@@ -1,6 +1,6 @@
 import { ObjectSchema, object, string } from 'yup';
 import validateWrapper, { objectValidateOverride } from '../../common/validator';
-import { EMAIL_REGEX, PASSWORD_REGEX } from '../../constant/regex';
+import { EMAIL_REGEX } from '../../constant/regex';
 import { TGetUserDetailByEmail, TGetUserDetailById, TUpdateProfileUser } from '../../types/api/user.types';
 
 const getUserDetailByIdObjectValidate: ObjectSchema<TGetUserDetailById> = object({
@@ -15,8 +15,7 @@ const getUserDetailByEmailObjectValidate: ObjectSchema<TGetUserDetailByEmail> = 
   .noUnknown(true)
   .strict();
 const updateProfileUserObjectValidate: ObjectSchema<TUpdateProfileUser> = object({
-  email: string().trim().matches(EMAIL_REGEX, { message: 'email format is invalid' }),
-  password: string().trim().matches(PASSWORD_REGEX, { message: 'password format is invalid' }),
+  password: string().trim(),
   fullName: string().trim(),
   avatar: string().trim(),
 })

@@ -103,6 +103,7 @@ const courseServices = {
       'participantsId',
       'status',
       'rating',
+      'label',
     ]);
 
     if (!course) {
@@ -149,6 +150,7 @@ const courseServices = {
         title: course.title,
         description: course.description,
         status: course.status,
+        label: course.label,
         totalJoined: course.participantsId.length,
         lessons: lessonWithUserStatus,
         isCurrentUserJoined: course.participantsId.some(

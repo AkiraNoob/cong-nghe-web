@@ -18,6 +18,7 @@ export type IGetCourseByIdResponse = {
   totalJoined: number;
   status: ECourseStatus;
   rating: number;
+  label: string[];
 
   lessons: Array<{
     _id: string;
@@ -38,4 +39,10 @@ export type TCoursePayload = {
   cover: string;
   lessonIds: string[];
   label: string[];
+};
+
+export type TSearchCourseResponse = {
+  _id: string;
+  title: string;
+  cover: string;
 };

@@ -35,7 +35,8 @@ const commentsService = {
     if (courseId) {
       const course = await courseExistsMiddleware(req);
       course.comments.push(comment._id.toString());
-      course.rating = (course.rating + (comment.rating || 0)) / course.comments.length;
+      course.rating =
+        (course.rating * (course.comments.length - 1 || 0) + (comment.rating || 0)) / course.comments.length;
       await course.save();
     }
 
@@ -70,10 +71,28 @@ const commentsService = {
     };
   },
   deleteCommentById: async (req: Request): Promise<TServiceResponseType<null>> => {
-    const reqParams = req.params as TDeleteCommentPayload;
+    const reqParams = req.params as Pick<TDeleteCommentPayload, 'commentId'>;
+    const reqQuery = req.query as Omit<TDeleteCommentPayload, 'commentId'>;
 
     const comment = await commentExistsMiddleware(reqParams.commentId);
     await userIsOwnerOfCommentMiddleware(req, comment);
+
+    if (reqQuery.courseId) {
+      const course = await courseExistsMiddleware(req);
+      if (course.comments.length - 1 > 0) {
+        course.rating = (course.rating * course.comments.length - (comment.rating || 0)) / (course.comments.length - 1);
+      } else {
+        course.rating = 0;
+      }
+      course.comments = course.comments.filter((item) => item !== reqParams.commentId);
+      await course.save();
+    }
+
+    if (reqQuery.lessonId) {
+      const lesson = await lessonExistsMiddleware(req);
+      lesson.comments = lesson.comments.filter((item) => item !== reqParams.commentId);
+      await lesson.save();
+    }
 
     await comment.deleteOne();
     const concurrentPromise = comment.replies.map((eachSubCommentId) =>

@@ -4,7 +4,7 @@
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
-import { Skeleton } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent, Skeleton } from '@mui/material';
 import Button from '@mui/material/Button';
 import CardMedia from '@mui/material/CardMedia';
 import Dialog from '@mui/material/Dialog';
@@ -12,16 +12,36 @@ import IconButton from '@mui/material/IconButton';
 import Slide from '@mui/material/Slide';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { Theme, useTheme } from '@mui/material/styles';
 import { TransitionProps } from '@mui/material/transitions';
 import { useParams } from 'next/navigation';
 import { forwardRef, useRef, useState } from 'react';
 import { ECourseStatus } from '~/constant/enum/course.enum';
+import { labels } from '~/constant/labels';
 import useChangeCourseStatus from '~/hooks/course/useChangeCourseStatus';
 import useCourseDetail from '~/hooks/course/useCourseDetail';
 import useUpdateCourse from '~/hooks/course/useUpdateCourse';
 import { useUploadImage } from '~/hooks/useUploadFile';
 import { IGetCourseByIdResponse } from '~/types/api/course.types';
 import LoadingButtonProvider from '../loading_button';
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+function getStyles(name: string, personName: string[], theme: Theme) {
+  return {
+    fontWeight:
+      personName.indexOf(name) === -1 ? theme.typography.fontWeightRegular : theme.typography.fontWeightMedium,
+  };
+}
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -58,7 +78,7 @@ const EditCourseInformation = ({ courseId }: { courseId: string }) => {
             <div className="items-center">
               <CardMedia
                 sx={{ height: 220, borderRadius: 1, display: 'flex', aspectRatio: 1.67 }}
-                image={data?.cover}
+                image={data?.cover || '/images/default_cover.png'}
                 title="green iguana"
               />
             </div>
@@ -145,6 +165,7 @@ function CustomDialog({
   const [nameCourse, setNameCourse] = useState(defaultData?.title || '');
 
   const [description, setDescription] = useState(defaultData?.description || '');
+  const [label, setLabel] = useState<string[]>(defaultData?.label || []);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -168,8 +189,21 @@ function CustomDialog({
     mutate({
       title: nameCourse,
       description,
+      label,
       cover: imgSrc,
     });
+  };
+
+  const theme = useTheme();
+
+  const handleChange = (event: SelectChangeEvent<typeof label>) => {
+    const {
+      target: { value },
+    } = event;
+    setLabel(
+      // On autofill we get a stringified value.
+      typeof value === 'string' ? value.split(',') : value,
+    );
   };
 
   return (
@@ -205,6 +239,26 @@ function CustomDialog({
             multiline
             required
           />
+
+          <FormControl sx={{ width: 300 }}>
+            <InputLabel id="demo-multiple-name-label">Chọn label khoá học</InputLabel>
+            <Select
+              labelId="demo-multiple-name-label"
+              id="demo-multiple-name"
+              multiple
+              value={label}
+              onChange={handleChange}
+              input={<OutlinedInput label="Chọn label khoá học" />}
+              MenuProps={MenuProps}
+            >
+              {labels.map((name) => (
+                <MenuItem key={name} value={name} style={getStyles(name, labels, theme)}>
+                  {name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <div className="relative rounded-2xl w-fit mx-auto">
             <input
               type="file"

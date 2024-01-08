@@ -17,18 +17,6 @@ import routePath from '~/constant/routePath';
 import { generatePathname } from '~/helper/generatePathname';
 import useCourseStatistic from '~/hooks/statistic/useCourseStatistic';
 
-function CourseStatisticData(
-  id: string,
-  name: string,
-  numberlesson: number,
-  time: string,
-  numbermember: number,
-  rating: number,
-  image: string,
-) {
-  return { id, name, numberlesson, time, numbermember, rating, image };
-}
-
 const CourseStatistics: React.FC = () => {
   const { data, isSuccess } = useCourseStatistic();
 
@@ -48,7 +36,7 @@ const CourseStatistics: React.FC = () => {
   if (data && isSuccess) {
     return (
       <>
-        <div className="pr-10 pl-10 pb-10 pt-5">
+        <div className="lg:pr-10 lg:pl-10 lg:pb-10 lg:pt-5 p-3">
           <div className="sm:flex sm:justify-between pb-5">
             <h2 className="text-3xl font-bold mb-3">Thống kê khóa học</h2>
             <AddCourseButton />
@@ -74,7 +62,7 @@ const CourseStatistics: React.FC = () => {
                       <div className="flex items-center">
                         <CardMedia
                           sx={{ height: 70, width: 90, borderRadius: 1, display: 'flex' }}
-                          image={row.cover}
+                          image={row.cover || '/images/default_cover.png'}
                           title="green iguana"
                         ></CardMedia>
                         <span className="ml-5">{row.title}</span>
@@ -109,7 +97,7 @@ const CourseStatistics: React.FC = () => {
                   time={item.createdAt}
                   numbermember={item.participantsId.length}
                   rating={item.rating}
-                  image={item.cover}
+                  image={item.cover || '/images/default_cover.png'}
                   onClick={() => handleButtonClick(item._id)}
                 />
               </div>
@@ -121,13 +109,17 @@ const CourseStatistics: React.FC = () => {
   }
 
   return (
-    <>
+    <div className="lg:pr-10 lg:pl-10 lg:pb-10 lg:pt-5 p-3">
+      <div className="sm:flex sm:justify-between pb-5">
+        <h2 className="text-3xl font-bold mb-3">Thống kê khóa học</h2>
+        <Skeleton height={60} width={'200px'} variant="rounded" />
+      </div>
       {new Array(10).fill(0).map((_, index) => (
-        <div key={index}>
+        <div key={index} className="mb-3">
           <Skeleton height={60} width={'100%'} variant="rounded" />
         </div>
       ))}
-    </>
+    </div>
   );
 };
 export default CourseStatistics;

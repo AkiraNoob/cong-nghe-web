@@ -1,5 +1,6 @@
 'use client';
-import { Logout, Settings } from '@mui/icons-material';
+import { Logout } from '@mui/icons-material';
+import AnalyticsOutlinedIcon from '@mui/icons-material/AnalyticsOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import { ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
@@ -9,13 +10,17 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useContext } from 'react';
+import { EUserRole } from '~/constant/enum/user.enum';
+import routePath from '~/constant/routePath';
 import { userContext } from '~/context/UserContext';
 import useLogout from '~/hooks/auth/useLogout';
 import SearchComponent from './search_component';
 
-const HeaderComponent: React.FC = () => {
+const HeaderComponent = () => {
   const { isLogin: auth, data } = useContext(userContext);
+  const router = useRouter();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -30,11 +35,6 @@ const HeaderComponent: React.FC = () => {
   const handleLogout = () => {
     mutate();
     handleClose();
-  };
-
-  const handleSearch = (query: String) => {
-    // Xử lý logic tìm kiếm dựa trên query
-    console.log('Perform search with query:', query);
   };
 
   return (
@@ -108,20 +108,27 @@ const HeaderComponent: React.FC = () => {
               transformOrigin={{ horizontal: 'right', vertical: 'top' }}
               anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
-              <MenuItem onClick={handleClose}>
-                <Avatar /> My account
+              <MenuItem
+                onClick={() => {
+                  router.push(routePath.EDIT);
+                  handleClose();
+                }}
+              >
+                <Avatar /> Tài khoản của tôi
               </MenuItem>
-              <MenuItem onClick={handleClose}>
-                <ListItemIcon>
-                  <Settings fontSize="small" />
-                </ListItemIcon>
-                Settings
-              </MenuItem>
+              {data?.role === EUserRole.Admin && (
+                <MenuItem onClick={() => router.push(routePath.COURSE_STATISTIC)}>
+                  <ListItemIcon>
+                    <AnalyticsOutlinedIcon fontSize="small" />
+                  </ListItemIcon>
+                  Thống kê
+                </MenuItem>
+              )}
               <MenuItem onClick={handleLogout}>
                 <ListItemIcon>
                   <Logout fontSize="small" />
                 </ListItemIcon>
-                Logout
+                Đăng xuất
               </MenuItem>
             </Menu>
           </Box>

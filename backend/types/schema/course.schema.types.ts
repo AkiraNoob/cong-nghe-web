@@ -3,7 +3,7 @@ import { ECourseStatus } from '../../constant/enum/course.enum';
 export type TCourseSchema = {
   title: string;
   description: string;
-  cover: string;
+  cover?: string;
   rating: number;
   lessonIds: string[];
   status: ECourseStatus;

@@ -6,7 +6,7 @@ import { TCourseById, TCoursePayload, TGetCourseNavigatePayload, TUpdateCourse }
 const postCourseObjectValidate: ObjectSchema<Omit<TCoursePayload, 'status'>> = object({
   title: string().required(),
   description: string().required(),
-  cover: string().required(),
+  cover: string(),
   lessonIds: array().of(string().required()).default([]),
   label: array().of(string().required()).default([]),
 });

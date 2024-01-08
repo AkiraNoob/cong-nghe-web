@@ -18,12 +18,12 @@ const getDetailStatisticOfMemberOfCourseObjectValudate: ObjectSchema<TGetDetailS
 
 const statisticValidator = {
   validateGetDetailStatisticOfCourse: validateWrapper<TGetDetailStatisticOfCourseRequest>((req) =>
-    objectValidateOverride(getDetailStatisticOfCourseObjectValidate, req.body as TGetDetailStatisticOfCourseRequest),
+    objectValidateOverride(getDetailStatisticOfCourseObjectValidate, req.params as TGetDetailStatisticOfCourseRequest),
   ),
   validateGetDetailStatisticOfMemberOfCourse: validateWrapper<TGetDetailStatisticMemberOfCourseRequest>((req) =>
     objectValidateOverride(
       getDetailStatisticOfMemberOfCourseObjectValudate,
-      req.body as TGetDetailStatisticMemberOfCourseRequest,
+      req.params as TGetDetailStatisticMemberOfCourseRequest,
     ),
   ),
 };

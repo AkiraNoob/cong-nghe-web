@@ -16,6 +16,11 @@ export const getRepliesOfComment = (commentId: string) =>
 export const postCreateComment = (data: TCreateCommentPayload) =>
   httpRequest.post<TCUCommentResponse>(`/comment`, data);
 export const putUpdateComment = (data: TUpdateCommentPayload) => httpRequest.put<TCUCommentResponse>(`/comment`, data);
-export const deleteComment = (commentId: string) => httpRequest.delete<TCUCommentResponse>(`/comment/${commentId}`);
+export const deleteComment = (data: { commentId: string; courseId?: string; lessonId?: string }) =>
+  httpRequest.delete<TCUCommentResponse>(
+    `/comment/${data.commentId}?&${data.commentId && `courseId=${data.courseId}`}&${
+      data.lessonId && `lessonId=${data.lessonId}`
+    }`,
+  );
 
 export const putUpdateLikeAndDislike = (data: TUpdateLikeAndDislike) => httpRequest.put(`/comment/like-dislike`, data);

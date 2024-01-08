@@ -3,7 +3,6 @@ import validateWrapper, { objectValidateOverride } from '../../common/validator'
 import { TCourseId, TCourseTitle, TUserAndCourseById } from '../../types/api/userCourse';
 
 const postUserAndCourseByIdObjectValidate: ObjectSchema<TUserAndCourseById> = object({
-  userId: string().required(),
   courseId: string().required(),
 });
 const getSearchCourseTitle: ObjectSchema<TCourseTitle> = object({
@@ -14,7 +13,7 @@ const getCourseSuggestions: ObjectSchema<TCourseId> = object({
 });
 const userCourseValidator = {
   validateSearchCourseTitle: validateWrapper((req) =>
-    objectValidateOverride(getSearchCourseTitle, req.query as TCourseTitle),
+    objectValidateOverride(getSearchCourseTitle, req.body as TCourseTitle),
   ),
   validateCourseSuggestions: validateWrapper((req) =>
     objectValidateOverride(getCourseSuggestions, req.params as TCourseId),

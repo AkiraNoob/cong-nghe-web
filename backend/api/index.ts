@@ -1,5 +1,5 @@
 import express from 'express';
-import authenticateMiddleware from '../middleware/auth';
+import authenticateMiddleware, { nonStrictAuthenticateMiddleware } from '../middleware/auth';
 import { userRolePermissionMiddleware } from '../middleware/permissionAccess';
 import authRoute from './auth/route';
 import commentRoute from './comments/route';
@@ -20,6 +20,6 @@ apiRoute.use('/course', courseRoute);
 apiRoute.use('/statistic', authenticateMiddleware, userRolePermissionMiddleware(), statisticRoute);
 apiRoute.use('/file', authenticateMiddleware, fileRoute);
 apiRoute.use('/comment', commentRoute);
-apiRoute.use('/user-courses', authenticateMiddleware, userRolePermissionMiddleware(), userCourseRoute);
+apiRoute.use('/user-courses', nonStrictAuthenticateMiddleware, userCourseRoute);
 
 export default apiRoute;

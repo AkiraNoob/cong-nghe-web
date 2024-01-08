@@ -25,8 +25,13 @@ const updateCommentObjectValidate: ObjectSchema<TUpdateCommentPayload> = object(
   commentId: string().required(),
 });
 
-const deleteCommentObjectValidate: ObjectSchema<TDeleteCommentPayload> = object({
+const deleteCommentObjectValidate: ObjectSchema<Pick<TDeleteCommentPayload, 'commentId'>> = object({
   commentId: string().required(),
+});
+
+const deleteCommentParamsObjectValidate: ObjectSchema<Omit<TDeleteCommentPayload, 'commentId'>> = object({
+  courseId: string(),
+  lessonId: string(),
 });
 
 const getCommentByCourseIdObjectValidate: ObjectSchema<TGetCommentByCourseId> = object({
@@ -54,7 +59,10 @@ const commentValidator = {
     objectValidateOverride(updateCommentObjectValidate, req.body as TUpdateCommentPayload),
   ),
   validateDeleteComment: validateWrapper((req) =>
-    objectValidateOverride(deleteCommentObjectValidate, req.params as TDeleteCommentPayload),
+    objectValidateOverride(deleteCommentObjectValidate, req.params as Pick<TDeleteCommentPayload, 'commentId'>),
+  ),
+  validateDeleteCommentQuery: validateWrapper((req) =>
+    objectValidateOverride(deleteCommentParamsObjectValidate, req.query as Omit<TDeleteCommentPayload, 'commentId'>),
   ),
   validateGetCommentByCourseId: validateWrapper((req) =>
     objectValidateOverride(getCommentByCourseIdObjectValidate, req.params as TGetCommentByCourseId),

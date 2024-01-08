@@ -1,7 +1,8 @@
 'use client';
 import { People } from '@mui/icons-material';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import { Card, CardMedia, ListItemIcon, MenuItem, Rating } from '@mui/material';
+import { Card, CardMedia, ListItemIcon, MenuItem } from '@mui/material';
+import moment from 'moment';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import routePath from '~/constant/routePath';
@@ -29,7 +30,7 @@ const CourseComponent: React.FC<CourseComponentProps> = ({ id, image, name, date
   return (
     <div className="relative rounded-2xl" onClick={onClickCourse}>
       <Card>
-        <CardMedia sx={{ height: 200 }} image={image} title="green iguana" />
+        <CardMedia sx={{ height: 200 }} image={image || '/images/default_cover.png'} title="green iguana" />
         <div className="rounded-tr pt-2 pl-3 pr-3">
           <h1 className="font-bold">{name}</h1>
         </div>
@@ -43,7 +44,7 @@ const CourseComponent: React.FC<CourseComponentProps> = ({ id, image, name, date
           <MenuItem>
             <ListItemIcon>
               <CalendarMonthIcon fontSize="small" />
-              <span className="text-sm ml-1">Ngày tạo: {date && new Date(date).toLocaleDateString()}</span>
+              <span className="text-sm ml-1">Ngày tạo: {date && moment(date).format('DD/MM/YYYY')}</span>
             </ListItemIcon>
           </MenuItem>
         </div>

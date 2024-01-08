@@ -17,6 +17,7 @@ const courseSchema = new Schema<TCourseDocument>(
     },
     cover: {
       type: String,
+      default: '',
     },
     rating: {
       type: Number,

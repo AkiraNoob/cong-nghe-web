@@ -2,11 +2,21 @@
 
 import { Button, Rating, Skeleton } from '@mui/material';
 import Image from 'next/image';
+import { useContext } from 'react';
+import { userContext } from '~/context/UserContext';
 import useCourseDetail from '~/hooks/course/useCourseDetail';
+import useJoinCourse from '~/hooks/course/useJoinCourse';
 import LessonComponent from '../lesson_component';
 
 const CourseInformationComponent = ({ courseId }: { courseId: string }) => {
-  const { data, isSuccess } = useCourseDetail(courseId, {});
+  const { data, isSuccess, refetch } = useCourseDetail(courseId, {});
+  const { isLogin } = useContext(userContext);
+
+  const { mutate } = useJoinCourse({
+    onSuccess() {
+      refetch();
+    },
+  });
 
   if (isSuccess && data) {
     return (
@@ -33,11 +43,17 @@ const CourseInformationComponent = ({ courseId }: { courseId: string }) => {
         </div>
 
         <div className="basis-1/4 p-4 flex flex-col items-center gap-[30px]">
-          <Image src={data.cover} alt="course cover" className="rounded-xl aspect-[1.67]" width={400} height={240} />
+          <Image
+            src={data?.cover || '/images/default_cover.png'}
+            alt="course cover"
+            className="rounded-xl aspect-[1.67]"
+            width={400}
+            height={240}
+          />
           <div>
             <div className="mx-auto flex flex-col gap-3 items-center">
-              {data.isCurrentUserJoined && (
-                <Button className="!w-fit" variant="contained">
+              {!data.isCurrentUserJoined && (
+                <Button disabled={!isLogin} onClick={() => mutate(courseId)} className="!w-fit" variant="contained">
                   Tham gia khoá học
                 </Button>
               )}

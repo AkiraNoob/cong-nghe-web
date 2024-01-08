@@ -106,7 +106,7 @@ const statisticService = {
     };
   },
   getMemberOfCourse: async (req: Request): Promise<TServiceResponseType<TGetMemberOfCourseStatisticResponse[]>> => {
-    const reqBody = req.body as TGetDetailStatisticMemberOfCourseRequest;
+    const reqBody = req.params as TGetDetailStatisticMemberOfCourseRequest;
 
     const course = await courseExistsMiddleware(req);
     await userJoinedCoursePermissionMiddleware(course, reqBody.userId);

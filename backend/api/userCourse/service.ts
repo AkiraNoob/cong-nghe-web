@@ -1,17 +1,20 @@
 import { Request } from 'express';
+import { ECourseStatus } from '../../constant/enum/course.enum';
 import AppError from '../../constant/error';
 import { EHttpStatus } from '../../constant/statusCode';
 import CourseModel from '../../models/course';
-import { TCourseId, TCourseTitle, TUserAndCourseById } from '../../types/api/userCourse';
 import UserModel from '../../models/user';
+import { TUserMiddlewareParse } from '../../types/api/auth.types';
+import { TCourseId, TCourseTitle, TUserAndCourseById } from '../../types/api/userCourse';
 // import { Date } from 'mongoose';
 const userCourseServices = {
   userJoinCourseById: async (req: Request) => {
     const reqBody = req.body as TUserAndCourseById;
-    const userId = reqBody.userId;
+    const reqUser = req.user as TUserMiddlewareParse;
+
     const courseId = reqBody.courseId;
     const course = await CourseModel.findById({ _id: courseId });
-    const user = await UserModel.findById({ _id: userId });
+    const user = await UserModel.findById({ _id: reqUser.id });
 
     if (!user) {
       throw new AppError(EHttpStatus.NOT_FOUND, 'User not found');
@@ -19,7 +22,7 @@ const userCourseServices = {
     if (!course) {
       throw new AppError(EHttpStatus.NOT_FOUND, 'Course not found');
     }
-    const existingParticipation = course.participantsId.find((participant) => participant.userId === userId);
+    const existingParticipation = course.participantsId.find((participant) => participant.userId === reqUser.id);
 
     if (existingParticipation) {
       return {
@@ -29,7 +32,7 @@ const userCourseServices = {
       };
     }
     const userParticipation = {
-      userId: userId,
+      userId: reqUser.id,
       participatedDate: new Date(Date.now()),
     };
     course.participantsId.push(userParticipation);
@@ -46,10 +49,11 @@ const userCourseServices = {
   },
   deleteUserJoinedCourseById: async (req: Request) => {
     const reqBody = req.body as TUserAndCourseById;
-    const userId = reqBody.userId;
+    const reqUser = req.user as TUserMiddlewareParse;
+
     const courseId = reqBody.courseId;
     const course = await CourseModel.findById({ _id: courseId });
-    const user = await UserModel.findById({ _id: userId });
+    const user = await UserModel.findById({ _id: reqUser.id });
 
     if (!user) {
       throw new AppError(EHttpStatus.NOT_FOUND, 'User not found');
@@ -58,7 +62,7 @@ const userCourseServices = {
       throw new AppError(EHttpStatus.NOT_FOUND, 'Course not found');
     }
 
-    const participantIndex = course.participantsId.findIndex((participant) => participant.userId === userId);
+    const participantIndex = course.participantsId.findIndex((participant) => participant.userId === reqUser.id);
 
     if (participantIndex === -1) {
       return {
@@ -93,11 +97,10 @@ const userCourseServices = {
     };
   },
   searchCourseTitle: async (req: Request) => {
-    const { courseTitle } = req.query as TCourseTitle;
-    console.log('courseTitle: ', courseTitle);
+    const { courseTitle } = req.body as TCourseTitle;
     const searchQuery = { $text: { $search: courseTitle } };
 
-    const courses = await CourseModel.find(searchQuery).select('_id title');
+    const courses = await CourseModel.find({ ...searchQuery, status: ECourseStatus.Publish }).select('_id title cover');
 
     return {
       data: courses,
@@ -108,7 +111,7 @@ const userCourseServices = {
 
   getCourseSuggestions: async (req: Request) => {
     const { courseId } = req.params as TCourseId;
-    console.log('courseId: ', courseId);
+
     const course = await CourseModel.findById({ _id: courseId }).select('label');
 
     if (!course) {
@@ -119,7 +122,7 @@ const userCourseServices = {
     const courses = await CourseModel.find({
       label: { $in: courseLabels },
       _id: { $ne: courseId },
-    }).select('_id title label');
+    }).select('_id title cover participantsId createdAt');
 
     return {
       data: courses,

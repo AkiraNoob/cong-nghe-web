@@ -16,6 +16,8 @@ export type TUpdateCommentPayload = {
 
 export type TDeleteCommentPayload = {
   commentId: string;
+  lessonId?: string;
+  courseId?: string;
 };
 
 export type TGetCommentByCourseId = {

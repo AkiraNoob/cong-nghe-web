@@ -1,6 +1,6 @@
 import express from 'express';
 import { EUserRole } from '../../constant/enum/user.enum';
-import authenticateMiddleware from '../../middleware/auth';
+import authenticateMiddleware, { nonStrictAuthenticateMiddleware } from '../../middleware/auth';
 import { userRolePermissionMiddleware } from '../../middleware/permissionAccess';
 import courseControllers from './controller';
 import courseValidator from './validator';
@@ -30,7 +30,12 @@ courseRoute.post(
   courseControllers.changeStatus,
 );
 
-courseRoute.get('/:courseId', courseValidator.validateCourseById, courseControllers.getCourseById);
+courseRoute.get(
+  '/:courseId',
+  nonStrictAuthenticateMiddleware,
+  courseValidator.validateCourseById,
+  courseControllers.getCourseById,
+);
 
 courseRoute.delete(
   '/:courseId',

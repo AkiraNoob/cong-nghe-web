@@ -3,9 +3,11 @@ import { Checklist, Code, PlayCircle } from '@mui/icons-material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import React from 'react';
+import React, { useContext } from 'react';
+import { toast } from 'react-toastify';
 import { ELessonType, EUserLessonStatus } from '~/constant/enum/lesson.enum';
 import routePath from '~/constant/routePath';
+import { userContext } from '~/context/UserContext';
 import { parseDurationVideo } from '~/helper/parseDurationVideo';
 
 interface lessonComponentProps {
@@ -32,10 +34,18 @@ const renderIcon = (exerciseType: lessonComponentProps['exerciseType']) => {
 
 const LessonComponent: React.FC<lessonComponentProps> = ({ id: lessonId, name, quantity, exerciseType, status }) => {
   const { courseId } = useParams();
+
+  const { isLogin } = useContext(userContext);
+
   return (
     <Link
-      href={routePath.LESSON_DETAIL.replace('[courseId]', courseId as string).replace('[lessonId]', lessonId)}
+      href={
+        isLogin
+          ? routePath.LESSON_DETAIL.replace('[courseId]', courseId as string).replace('[lessonId]', lessonId)
+          : '#'
+      }
       className="flex flex-row items-center place-items-center gap-3 p-3 hover:bg-slate-200 rounded-lg"
+      onClick={() => !isLogin && toast('Vui lòng đăng nhập')}
     >
       {renderIcon(exerciseType)}
       <p className="px-2 flex-1">{name}</p>
