@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import React from 'react';
 import { ELessonType, EUserLessonStatus } from '~/constant/enum/lesson.enum';
 import routePath from '~/constant/routePath';
+import { parseDurationVideo } from '~/helper/parseDurationVideo';
 
 interface lessonComponentProps {
   id: string;
@@ -31,7 +32,6 @@ const renderIcon = (exerciseType: lessonComponentProps['exerciseType']) => {
 
 const LessonComponent: React.FC<lessonComponentProps> = ({ id: lessonId, name, quantity, exerciseType, status }) => {
   const { courseId } = useParams();
-
   return (
     <Link
       href={routePath.LESSON_DETAIL.replace('[courseId]', courseId as string).replace('[lessonId]', lessonId)}
@@ -40,7 +40,11 @@ const LessonComponent: React.FC<lessonComponentProps> = ({ id: lessonId, name, q
       {renderIcon(exerciseType)}
       <p className="px-2 flex-1">{name}</p>
       {status === EUserLessonStatus.Done ? <CheckCircleOutlineIcon color="success" className="ml-2" /> : <div></div>}
-      {quantity && <p className="min-w-[48px] text-center">{quantity}</p>}
+      {quantity && (
+        <p className="min-w-[48px] text-center">
+          {exerciseType === ELessonType.Video ? `${parseDurationVideo(parseInt(quantity))}` : `${quantity} câu`}
+        </p>
+      )}
     </Link>
   );
 };

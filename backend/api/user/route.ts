@@ -8,4 +8,10 @@ userRoute.get('/email', userValidator.validateGetUserDetailByEmail, userControll
 userRoute.get('/me', userController.getMe);
 userRoute.get('/:userId', userValidator.validateGetUserDetailById, userController.getUserById);
 
+userRoute.put(
+  '/:userId',
+  userValidator.validateGetUserDetailById,
+  (req, res, next) => userValidator.validateUpdateProfileUser(req, res, next),
+  (req, res, next) => userController.updateProfileUser(req, res, next),
+);
 export default userRoute;

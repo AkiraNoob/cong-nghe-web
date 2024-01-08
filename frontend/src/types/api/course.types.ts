@@ -1,3 +1,4 @@
+import { ECourseStatus } from '~/constant/enum/course.enum';
 import { ELessonType, EUserLessonStatus } from '~/constant/enum/lesson.enum';
 
 export interface IAllCouresResponse {
@@ -15,6 +16,8 @@ export type IGetCourseByIdResponse = {
   cover: string;
   isCurrentUserJoined: boolean;
   totalJoined: number;
+  status: ECourseStatus;
+  rating: number;
 
   lessons: Array<{
     _id: string;
@@ -26,7 +29,7 @@ export type IGetCourseByIdResponse = {
 };
 
 export type TGetCourseNavigateResponse = {
-  lessons: { title: string; type: ELessonType; _id: string }[];
+  lessons: { title: string; type: ELessonType; _id: string; status: EUserLessonStatus }[];
 };
 
 export type TCoursePayload = {

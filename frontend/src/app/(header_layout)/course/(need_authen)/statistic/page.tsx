@@ -9,6 +9,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { yellow } from '@mui/material/colors';
+import moment from 'moment';
 import { useRouter } from 'next/navigation';
 import AddCourseButton from '~/components/course/add_course_button';
 import SttCourse from '~/components/statistics/stt_course';
@@ -80,7 +81,7 @@ const CourseStatistics: React.FC = () => {
                       </div>
                     </TableCell>
                     <TableCell align="center">{row.participantsId.length}</TableCell>
-                    <TableCell align="center">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell align="center">{moment(row.createdAt).format('DD/MM/YYYY')}</TableCell>
                     <TableCell align="center">{row.lessonIds.length}</TableCell>
                     <TableCell align="center">
                       <div>

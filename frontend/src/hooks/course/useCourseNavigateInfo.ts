@@ -1,8 +1,10 @@
 import { QueryKey, UseQueryOptions, useQuery } from '@tanstack/react-query';
-import { useContext, useMemo } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
+import { toast } from 'react-toastify';
 import { getCourseNavigate } from '~/api/course.api';
 import { QUERY_KEY } from '~/constant/reactQueryKey';
 import { userContext } from '~/context/UserContext';
+import { parseErrorMessage } from '~/helper/parseErrorMessage';
 import { TGetCourseNavigateResponse } from '~/types/api/course.types';
 import { TError } from '~/types/generic.types';
 
@@ -20,6 +22,18 @@ const useCourseNavigateInfo = (
     ...config,
   });
 
+  useEffect(() => {
+    if (queryReturn.error) {
+      const _err = queryReturn.error;
+      const msg = parseErrorMessage(_err);
+      if (Array.isArray(msg)) {
+        msg.map((item) => toast(item, { type: 'error' }));
+        return;
+      }
+      toast(msg, { type: 'error' });
+    }
+  }, [queryReturn.error]);
+
   const prevAndPostId = useMemo(() => {
     if (queryReturn.data) {
       const _data = queryReturn.data;
@@ -32,7 +46,7 @@ const useCourseNavigateInfo = (
       return {
         prevId: _data.lessons[prevId]?._id,
         postId: _data.lessons[postId]?._id,
-        prevable: prevId > 0,
+        prevable: prevId >= 0,
         postable: postId < _data.lessons.length,
       };
     }

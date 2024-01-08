@@ -1,6 +1,6 @@
 import Avatar from '@mui/material/Avatar';
 import Rating from '@mui/material/Rating';
-import { format } from 'date-fns';
+import moment from 'moment';
 import React from 'react';
 import CommentInteraction, { CommentMenu } from './comment_interaction';
 
@@ -17,6 +17,7 @@ export interface ICommentComponentProps {
   rating?: number;
   avatar: string;
   createdAt: string;
+  _id: string;
 }
 
 const CommentComponent: React.FC<ICommentComponentProps> = ({
@@ -32,13 +33,13 @@ const CommentComponent: React.FC<ICommentComponentProps> = ({
   return (
     <div className="flex items-start space-x-4 mb-10">
       {/* Avatar, Đánh giá, Ngày bình luận */}
-      <div className="flex flex-col">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col w-full">
+        <div className="flex items-center gap-3 justify-between w-full">
           <div className="flex items-center space-x-4 flex-1">
             <Avatar src={avatar} alt={fullName} />
             <span className="font-bold">{fullName}</span>
             {!!rating && <Rating name="comment-rating" value={rating} precision={0.5} readOnly />}
-            <span className="text-gray-500">{format(createdAt, 'dd/MM/yyyy')}</span>
+            <span className="text-gray-500">{moment(createdAt).format('DD/MM/YYYY')}</span>
           </div>
           <CommentMenu userId={userId} />
         </div>

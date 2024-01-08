@@ -4,20 +4,24 @@ import { EHttpStatus } from '../../constant/statusCode';
 import { commentExistsMiddleware, courseExistsMiddleware, lessonExistsMiddleware } from '../../middleware/exists';
 import { userIsOwnerOfCommentMiddleware } from '../../middleware/permissionAccess';
 import CommentsModel from '../../models/comment';
+import UserModel from '../../models/user';
 import { TUserMiddlewareParse } from '../../types/api/auth.types';
 import {
+  EUpdateLikeAndDislikeAction,
   TCUCommentResponse,
   TCreateCommentPayload,
   TDeleteCommentPayload,
   TGetRepliesByCommentId,
   TUpdateCommentPayload,
+  TUpdateLikeAndDislike,
 } from '../../types/api/comments.types';
+import { TUserDocument } from '../../types/document.types';
 import { TServiceResponseType } from '../../types/general.types';
 
 const commentsService = {
   createNewComment: async (req: Request): Promise<TServiceResponseType<TCUCommentResponse>> => {
     const user = req.user as TUserMiddlewareParse;
-    const { rootCommentId, ...commentData } = req.body as TCreateCommentPayload;
+    const { rootCommentId, courseId, lessonId, ...commentData } = req.body as TCreateCommentPayload;
 
     const comment = await CommentsModel.create({ ...commentData, userId: user.id, isReply: !!rootCommentId });
 
@@ -28,8 +32,21 @@ const commentsService = {
       await parentComment.save();
     }
 
+    if (courseId) {
+      const course = await courseExistsMiddleware(req);
+      course.comments.push(comment._id.toString());
+      course.rating = (course.rating + (comment.rating || 0)) / course.comments.length;
+      await course.save();
+    }
+
+    if (lessonId) {
+      const lesson = await lessonExistsMiddleware(req);
+      lesson.comments.push(comment._id.toString());
+      await lesson.save();
+    }
+
     return {
-      data: generateCommentResponse(comment, user),
+      data: generateCommentResponse(comment, user, (await UserModel.findById(user.id)) as TUserDocument),
       statusCode: EHttpStatus.OK,
       message: 'Comment successfully',
     };
@@ -47,15 +64,15 @@ const commentsService = {
     await comment.save();
 
     return {
-      data: generateCommentResponse(comment, user),
+      data: generateCommentResponse(comment, user, (await UserModel.findById(user.id)) as TUserDocument),
       statusCode: EHttpStatus.OK,
       message: 'Update comment successfully',
     };
   },
   deleteCommentById: async (req: Request): Promise<TServiceResponseType<null>> => {
-    const reqBody = req.body as TDeleteCommentPayload;
+    const reqParams = req.params as TDeleteCommentPayload;
 
-    const comment = await commentExistsMiddleware(reqBody.commentId);
+    const comment = await commentExistsMiddleware(reqParams.commentId);
     await userIsOwnerOfCommentMiddleware(req, comment);
 
     await comment.deleteOne();
@@ -76,7 +93,11 @@ const commentsService = {
     const user = req.user as TUserMiddlewareParse;
 
     const concurrentPromise = course.comments.map((commentId) =>
-      CommentsModel.findById(commentId).then((comment) => (!comment ? null : generateCommentResponse(comment, user))),
+      CommentsModel.findById(commentId).then(async (comment) =>
+        !comment
+          ? null
+          : generateCommentResponse(comment, user, (await UserModel.findById(comment.userId)) as TUserDocument),
+      ),
     );
 
     const data: TCUCommentResponse[] = await Promise.all(concurrentPromise).then(
@@ -94,7 +115,11 @@ const commentsService = {
     const user = req.user as TUserMiddlewareParse;
 
     const concurrentPromise = lesson.comments.map((commentId) =>
-      CommentsModel.findById(commentId).then((comment) => (!comment ? null : generateCommentResponse(comment, user))),
+      CommentsModel.findById(commentId).then(async (comment) =>
+        !comment
+          ? null
+          : generateCommentResponse(comment, user, (await UserModel.findById(comment.userId)) as TUserDocument),
+      ),
     );
 
     const data: TCUCommentResponse[] = await Promise.all(concurrentPromise).then(
@@ -109,12 +134,16 @@ const commentsService = {
   },
   getRepliesByCommentId: async (req: Request): Promise<TServiceResponseType<TCUCommentResponse[]>> => {
     const user = req.user as TUserMiddlewareParse;
-    const reqBody = req.body as TGetRepliesByCommentId;
+    const reqParams = req.params as TGetRepliesByCommentId;
 
-    const comment = await commentExistsMiddleware(reqBody.commentId);
+    const comment = await commentExistsMiddleware(reqParams.commentId);
 
     const concurrentPromise = comment.replies.map((replyId) =>
-      CommentsModel.findById(replyId).then((comment) => (!comment ? null : generateCommentResponse(comment, user))),
+      CommentsModel.findById(replyId).then(async (comment) =>
+        !comment
+          ? null
+          : generateCommentResponse(comment, user, (await UserModel.findById(comment.userId)) as TUserDocument),
+      ),
     );
 
     const data: TCUCommentResponse[] = await Promise.all(concurrentPromise).then(
@@ -125,6 +154,50 @@ const commentsService = {
       data,
       statusCode: EHttpStatus.OK,
       message: 'Get replies successfully',
+    };
+  },
+  putLikeAndDislike: async (req: Request): Promise<TServiceResponseType<null>> => {
+    const reqBody = req.body as TUpdateLikeAndDislike;
+    const user = req.user as TUserMiddlewareParse;
+
+    const comment = await commentExistsMiddleware(reqBody.commentId);
+
+    const isCurrentUserLike = comment.likedUsers.findIndex((item) => item === user.id);
+    const isCurrentUserDislike = comment.unlikedUsers.findIndex((item) => item === user.id);
+
+    switch (reqBody.action) {
+      case EUpdateLikeAndDislikeAction.Like: {
+        if (isCurrentUserDislike >= 0) {
+          comment.unlikedUsers.splice(isCurrentUserDislike, 1);
+        }
+        if (isCurrentUserLike >= 0) {
+          comment.likedUsers.splice(isCurrentUserLike, 1);
+        } else {
+          comment.likedUsers.push(user.id);
+        }
+
+        break;
+      }
+      case EUpdateLikeAndDislikeAction.Dislike: {
+        if (isCurrentUserLike >= 0) {
+          comment.likedUsers.splice(isCurrentUserLike, 1);
+        }
+        if (isCurrentUserDislike >= 0) {
+          comment.unlikedUsers.splice(isCurrentUserDislike, 1);
+        } else {
+          comment.unlikedUsers.push(user.id);
+        }
+
+        break;
+      }
+    }
+
+    await comment.save();
+
+    return {
+      data: null,
+      statusCode: EHttpStatus.OK,
+      message: 'Update replies successfully',
     };
   },
 };

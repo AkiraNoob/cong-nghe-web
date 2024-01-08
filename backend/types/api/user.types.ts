@@ -7,5 +7,7 @@ export type TGetUserDetailById = {
 export type TGetUserDetailByEmail = {
   email: string;
 };
+export type TUserPayload = Pick<TUserSchema, 'email' | 'password' | 'fullName' | 'avatar'>;
+export type TUpdateProfileUser = Partial<TUserPayload>;
 
 export type TGetUserDetailDataResponse = Omit<TUserSchema, 'password'>;

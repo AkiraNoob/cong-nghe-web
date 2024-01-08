@@ -28,10 +28,10 @@ const useLogin = (config?: Partial<UseMutationOptions<string, TError, TAuthLogin
         },
       });
       if (Array.isArray(msg)) {
-        return msg.map((item) => toast(item));
+        return msg.map((item) => toast(item, { type: 'error' }));
       }
 
-      return toast(msg);
+      return toast(msg, { type: 'error' });
     },
   });
 };

@@ -6,6 +6,15 @@ const nextConfig = {
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
     CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'res.cloudinary.com',
+        port: '',
+      },
+    ],
+  },
 };
 
 module.exports = nextConfig;
