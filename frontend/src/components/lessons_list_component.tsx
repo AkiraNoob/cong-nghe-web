@@ -4,7 +4,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import ListIcon from '@mui/icons-material/List';
 import { Button, Drawer, IconButton } from '@mui/material';
 import { memo, useState } from 'react';
-import { EUserLessonStatus } from '~/constant/enum/lesson.enum';
 import { TGetCourseNavigateResponse } from '~/types/api/course.types';
 import LessonComponent from './lesson_component';
 
@@ -38,7 +37,7 @@ const LessonsListComponent = ({ lessons }: { lessons: TGetCourseNavigateResponse
           </IconButton>
           <h2 className="text-textMain text-2xl">Danh sách bài học</h2>
         </div>
-        <div className="grid grid-rows-[repeat(auto-fit,minmax(auto,1fr))] gap-y-2 my-5">
+        <div className="grid grid-rows-[repeat(auto-fit,minmax(auto,1fr))] gap-y-2 my-5 px-3">
           {lessons.map((item, index) => (
             <LessonComponent
               key={item._id}
@@ -46,7 +45,7 @@ const LessonsListComponent = ({ lessons }: { lessons: TGetCourseNavigateResponse
               name={item.title}
               quantity={''}
               exerciseType={item.type}
-              status={EUserLessonStatus.Pending}
+              status={item.status}
             />
           ))}
         </div>

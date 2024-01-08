@@ -12,7 +12,7 @@ import StrictModeDroppable from '../droppable';
 import LessonOwner from '../lesson/lesson_owner';
 
 const EditCourseLesson = ({ courseId }: { courseId: string }) => {
-  const { data, isSuccess, isLoading } = useCourseDetail(courseId);
+  const { data, isSuccess, isFetching } = useCourseDetail(courseId);
   const [lessonList, setLessonList] = useState<IGetCourseByIdResponse['lessons']>([]);
   const [selectLessonId, setSelectLessonId] = useState<string>('');
 
@@ -36,7 +36,7 @@ const EditCourseLesson = ({ courseId }: { courseId: string }) => {
         <AddLessonButton />
       </div>
       <div className="md:flex justify-end mt-3">
-        {!data || !isSuccess || isLoading ? (
+        {!data || !isSuccess || isFetching ? (
           <Skeleton variant="rounded" height={550} width={330} className="!mr-4" />
         ) : lessonList.length > 0 ? (
           <DragDropContext onDragEnd={onDragEnd}>
@@ -105,7 +105,7 @@ function AddLessonButton() {
       </Button>
 
       <Dialog fullWidth maxWidth="md" open={open} onClose={toggle}>
-        <EditLesson />
+        <EditLesson onSuccess={toggle} />
       </Dialog>
     </>
   );

@@ -15,10 +15,12 @@ import Typography from '@mui/material/Typography';
 import { TransitionProps } from '@mui/material/transitions';
 import { useParams } from 'next/navigation';
 import { forwardRef, useRef, useState } from 'react';
+import { ECourseStatus } from '~/constant/enum/course.enum';
 import useChangeCourseStatus from '~/hooks/course/useChangeCourseStatus';
 import useCourseDetail from '~/hooks/course/useCourseDetail';
 import useUpdateCourse from '~/hooks/course/useUpdateCourse';
 import { useUploadImage } from '~/hooks/useUploadFile';
+import { IGetCourseByIdResponse } from '~/types/api/course.types';
 import LoadingButtonProvider from '../loading_button';
 
 const Transition = forwardRef(function Transition(
@@ -31,7 +33,7 @@ const Transition = forwardRef(function Transition(
 });
 
 const EditCourseInformation = ({ courseId }: { courseId: string }) => {
-  const { data, isSuccess, refetch } = useCourseDetail(courseId);
+  const { data, isSuccess, refetch, isFetching } = useCourseDetail(courseId);
 
   const [open, setOpen] = useState(false);
 
@@ -39,15 +41,15 @@ const EditCourseInformation = ({ courseId }: { courseId: string }) => {
 
   return (
     <>
-      <ChangeCourseStatus />
+      <ChangeCourseStatus isLoading={isFetching} refetch={refetch} data={data} />
 
-      {isSuccess && data ? (
+      {(isSuccess && data) || !isFetching ? (
         <>
           <div className="flex justify-between flex-col-reverse md:flex-row">
             <div className="md:mr-10 md:mt-0 mt-3">
-              <h2 className=" text-2xl md:text-3xl font-bold mb-3">{data.title}</h2>
+              <h2 className=" text-2xl md:text-3xl font-bold mb-3">{data?.title}</h2>
               <div className="mb-3">
-                <span className="text-gray-600">{data.description}</span>
+                <span className="text-gray-600">{data?.description}</span>
               </div>
               <Button variant="contained" startIcon={<EditIcon />} sx={{ textTransform: 'none' }} onClick={toggle}>
                 Chỉnh sửa mô tả khóa học
@@ -56,12 +58,12 @@ const EditCourseInformation = ({ courseId }: { courseId: string }) => {
             <div className="items-center">
               <CardMedia
                 sx={{ height: 220, borderRadius: 1, display: 'flex', aspectRatio: 1.67 }}
-                image={data.cover}
+                image={data?.cover}
                 title="green iguana"
               />
             </div>
           </div>
-          <CustomDialog open={open} toggle={toggle} refetch={refetch} />
+          <CustomDialog open={open} toggle={toggle} refetch={refetch} defaultData={data} />
         </>
       ) : (
         <>
@@ -81,19 +83,52 @@ const EditCourseInformation = ({ courseId }: { courseId: string }) => {
 
 export default EditCourseInformation;
 
-function ChangeCourseStatus() {
-  useChangeCourseStatus();
+function ChangeCourseStatus({
+  refetch,
+  data,
+  isLoading,
+}: {
+  refetch: () => void;
+  data: IGetCourseByIdResponse | undefined;
+  isLoading: boolean;
+}) {
+  const { mutate, isPending } = useChangeCourseStatus({
+    onSuccess() {
+      refetch();
+    },
+  });
 
   return (
-    <div className="flex justify-end">
-      <Button color="secondary" variant="outlined" sx={{ textTransform: 'none', marginBottom: 2, borderRadius: 5 }}>
-        Xuất bản khóa học
-      </Button>
-    </div>
+    <LoadingButtonProvider className="w-fit ml-auto mb-4 rounded-[20px]" isLoading={isLoading || isPending}>
+      <div className="flex justify-end">
+        {!data ? (
+          <Skeleton variant="rounded" height={46} width={150} />
+        ) : (
+          <Button
+            onClick={() => mutate()}
+            color="secondary"
+            variant="outlined"
+            sx={{ textTransform: 'none', borderRadius: 5 }}
+          >
+            {data.status === ECourseStatus.Hidden ? 'Xuất bản khóa học' : 'Ẩn khoá học'}
+          </Button>
+        )}
+      </div>
+    </LoadingButtonProvider>
   );
 }
 
-function CustomDialog({ open, toggle, refetch }: { open: boolean; toggle: () => void; refetch: () => void }) {
+function CustomDialog({
+  open,
+  toggle,
+  refetch,
+  defaultData,
+}: {
+  open: boolean;
+  toggle: () => void;
+  refetch: () => void;
+  defaultData: IGetCourseByIdResponse | undefined;
+}) {
   const { courseId } = useParams();
 
   const { mutate, isPending } = useUpdateCourse(courseId as string, {
@@ -105,11 +140,11 @@ function CustomDialog({ open, toggle, refetch }: { open: boolean; toggle: () => 
   const { mutateAsync: uploadImage, isPending: isPendingUpload } = useUploadImage();
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
-  const imgUrl = useRef<string>();
+  const imgUrl = useRef<string>(defaultData?.cover || '');
 
-  const [nameCourse, setNameCourse] = useState('');
+  const [nameCourse, setNameCourse] = useState(defaultData?.title || '');
 
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState(defaultData?.description || '');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -124,14 +159,16 @@ function CustomDialog({ open, toggle, refetch }: { open: boolean; toggle: () => 
   };
 
   const handleSaveInformation = async () => {
-    const imgSrc = await uploadImage(selectedImage as Blob);
+    let imgSrc = imgUrl.current;
+
+    if (selectedImage) {
+      imgSrc = await uploadImage(selectedImage as Blob);
+    }
 
     mutate({
       title: nameCourse,
       description,
       cover: imgSrc,
-      label: [],
-      lessonIds: [],
     });
   };
 

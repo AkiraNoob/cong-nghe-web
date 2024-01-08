@@ -15,7 +15,7 @@ import useLogout from '~/hooks/auth/useLogout';
 import SearchComponent from './search_component';
 
 const HeaderComponent: React.FC = () => {
-  const { isLogin: auth } = useContext(userContext);
+  const { isLogin: auth, data } = useContext(userContext);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -68,7 +68,7 @@ const HeaderComponent: React.FC = () => {
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Tooltip title="Open profile">
               <IconButton onClick={handleClick} sx={{ p: 0, justifyContent: 'flex-end' }}>
-                <Avatar alt="Remy Sharp" src="/images/avatar.jpeg" />
+                <Avatar alt="Remy Sharp" src={data ? data.avatar : '/images/avatar.jpeg'} />
               </IconButton>
             </Tooltip>
             <Menu

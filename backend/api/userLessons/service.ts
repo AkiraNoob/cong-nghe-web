@@ -12,15 +12,19 @@ import { userJoinedCoursePermissionMiddleware } from '../../middleware/permissio
 import UserLessonModel from '../../models/userLessons';
 import { TUserMiddlewareParse } from '../../types/api/auth.types';
 import {
+  TGetResultLesson,
+  TGetResultLessonResponse,
   TSubmitLessonResult,
   TUserCodescriptLessonResultSubmit,
+  TUserSelectionLessonCheckpointResponse,
   TUserSelectionLessonResultSubmit,
   TUserVideoLessonResultSubmit,
 } from '../../types/api/userLesson.types';
+import { TServiceResponseType } from '../../types/general.types';
 import { TCodescriptLessonResourse, TSelectionLessonResourse } from '../../types/schema/lesson.schema.types';
 import { TUserSelectionLessonCheckpoint } from '../../types/schema/userLessons.schema.types';
 
-const lessonSerivce = {
+const userLessonService = {
   postResultVideoLesson: async (req: Request) => {
     const reqBody = req.body as TSubmitLessonResult<TUserVideoLessonResultSubmit>;
 
@@ -169,6 +173,49 @@ const lessonSerivce = {
       message: 'Submit lesson successfully',
     };
   },
+
+  getResult: async (req: Request): Promise<TServiceResponseType<null | TGetResultLessonResponse>> => {
+    const reqBody = req.query as TGetResultLesson;
+    const user = req.user as TUserMiddlewareParse;
+
+    await courseExistsMiddleware(req);
+    const lesson = await lessonExistsMiddleware(req);
+
+    const userLesson = await UserLessonModel.findOne({
+      userId: user.id,
+      courseId: reqBody.courseId,
+      lessonId: reqBody.lessonId,
+    });
+
+    if (!userLesson) {
+      return {
+        data: null,
+        statusCode: EHttpStatus.OK,
+        message: 'Get user result successfully',
+      };
+    }
+
+    const response = userLesson;
+
+    switch (response.type) {
+      case ELessonType.Selection: {
+        response.checkpoint = (response.checkpoint as TUserSelectionLessonCheckpointResponse[]).map((item, index) => ({
+          ...item,
+          correctAnswer: (lesson.resource as TSelectionLessonResourse[])[index].correctAnswer,
+        }));
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+
+    return {
+      data: response as TGetResultLessonResponse,
+      statusCode: EHttpStatus.OK,
+      message: 'Get user result successfully',
+    };
+  },
 };
 
-export default lessonSerivce;
+export default userLessonService;

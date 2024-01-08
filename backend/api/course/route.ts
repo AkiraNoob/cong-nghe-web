@@ -30,12 +30,8 @@ courseRoute.post(
   courseControllers.changeStatus,
 );
 
-courseRoute.get(
-  '/:courseId',
-  authenticateMiddleware,
-  courseValidator.validateCourseById,
-  courseControllers.getCourseById,
-);
+courseRoute.get('/:courseId', courseValidator.validateCourseById, courseControllers.getCourseById);
+
 courseRoute.delete(
   '/:courseId',
   authenticateMiddleware,

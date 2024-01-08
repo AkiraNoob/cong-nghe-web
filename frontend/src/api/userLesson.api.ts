@@ -1,5 +1,6 @@
 import { ELessonType, ESelectionAnswerChoiceList } from '~/constant/enum/lesson.enum';
 import httpRequest from '~/service/httpRequest';
+import { TUserLessonResponse } from '~/types/api/userLesson.types';
 
 export type TSubmitLessonResult<T> = {
   lessonId: string;
@@ -24,3 +25,13 @@ export type TUserCodescriptLessonResultSubmit = {
 };
 export const postCodescriptLessonResult = (data: TSubmitLessonResult<TUserCodescriptLessonResultSubmit>) =>
   httpRequest.post(`/user-lessons/result?type=${ELessonType.CodeScript}`, data);
+
+export type TGetUserLessonResult = {
+  lessonId: string;
+  courseId: string;
+  type: ELessonType;
+};
+export const getUserLessonResult = (body: TGetUserLessonResult) =>
+  httpRequest.get<TUserLessonResponse | null>(
+    `/user-lessons/result?type=${body.type}&courseId=${body.courseId}&lessonId=${body.lessonId}`,
+  );

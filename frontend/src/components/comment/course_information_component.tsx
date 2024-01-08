@@ -33,7 +33,7 @@ const CourseInformationComponent = ({ courseId }: { courseId: string }) => {
         </div>
 
         <div className="basis-1/4 p-4 flex flex-col items-center gap-[30px]">
-          <Image src={'/images/cplusplus.jpg'} alt="" className="rounded-xl aspect-[1.67]" width={400} height={240} />
+          <Image src={data.cover} alt="course cover" className="rounded-xl aspect-[1.67]" width={400} height={240} />
           <div>
             <div className="mx-auto flex flex-col gap-3 items-center">
               {data.isCurrentUserJoined && (
@@ -48,7 +48,7 @@ const CourseInformationComponent = ({ courseId }: { courseId: string }) => {
                 <p>
                   <b>Tổng số người tham gia:</b> {data?.totalJoined}
                 </p>
-                <Rating className="mx-auto" name="comment-rating" value={5} precision={0.5} readOnly />
+                <Rating className="mx-auto" name="comment-rating" value={data.rating} precision={0.5} readOnly />
               </div>
             </div>
           </div>

@@ -2,6 +2,7 @@ import { ObjectSchema, array, mixed, object, string } from 'yup';
 import validateWrapper, { objectValidateOverride } from '../../common/validator';
 import { ELessonType, ESelectionAnswerChoiceList } from '../../constant/enum/lesson.enum';
 import {
+  TGetResultLesson,
   TSubmitLessonResult,
   TUserCodescriptLessonResultSubmit,
   TUserSelectionLessonResultSubmit,
@@ -44,13 +45,19 @@ const postSubmitCodescriptLessonResultObjectValidate: ObjectSchema<
   }).required(),
 });
 
+const getResultLessonObjectValidate: ObjectSchema<TGetResultLesson> = object({
+  lessonId: string().required().trim(),
+  courseId: string().required().trim(),
+  type: mixed<ELessonType>().oneOf(Object.values(ELessonType)).required(),
+});
+
 export const postSubmitLessonResultParamsObjectValidate: ObjectSchema<{
   type: ELessonType;
 }> = object({
   type: mixed<ELessonType>().oneOf(Object.values(ELessonType)).required(),
 });
 
-const lessonValidator = {
+const userLessonValidator = {
   validateSubmitLessonResultQuery: validateWrapper((req) =>
     objectValidateOverride(postSubmitLessonResultParamsObjectValidate, req.query),
   ),
@@ -72,6 +79,9 @@ const lessonValidator = {
       req.body as TSubmitLessonResult<TUserCodescriptLessonResultSubmit>,
     ),
   ),
+  validateGetResultLesson: validateWrapper((req) =>
+    objectValidateOverride(getResultLessonObjectValidate, req.query as TGetResultLesson),
+  ),
 };
 
-export default lessonValidator;
+export default userLessonValidator;

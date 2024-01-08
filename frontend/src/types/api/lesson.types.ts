@@ -20,7 +20,6 @@ export type TLessonReponse<T extends TLessonResource> = {
 export type TVideoLessonResourse = {
   file: string;
   duration: string;
-  file_id: string;
 };
 
 export type TSelectionLessonResourse = {

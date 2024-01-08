@@ -15,10 +15,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             onError(_err, _key, _config) {
               const msg = parseErrorMessage(_err as unknown as TError);
               if (Array.isArray(msg)) {
-                return msg.map((item) => toast(item));
+                return msg.map((item) => toast(item, { type: 'error' }));
               }
 
-              return toast(msg);
+              return toast(msg, { type: 'error' });
             },
           },
           queries: {

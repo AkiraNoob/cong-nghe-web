@@ -17,13 +17,17 @@ const useUpdateLesson = (
   const mutationReturn = useMutation({
     mutationFn: (data: Omit<TCreateLessonPayload<TLessonResource>, 'courseId'>) =>
       updateLesson(lessonId as string, { ...data, courseId: courseId as string }),
+    onSuccess(_data, _key, _config) {
+      toast('Bài học đã được cập nhật.');
+      config?.onSuccess && config?.onSuccess(_data, _key, _config);
+    },
     onError(_err, _key, _config) {
       const msg = parseErrorMessage(_err);
       if (Array.isArray(msg)) {
-        return msg.map((item) => toast(item));
+        return msg.map((item) => toast(item, { type: 'error' }));
       }
 
-      return toast(msg);
+      return toast(msg, { type: 'error' });
     },
     ...config,
   });

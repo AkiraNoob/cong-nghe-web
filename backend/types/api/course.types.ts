@@ -9,7 +9,7 @@ export type TCourseById = {
 };
 export type TUpdateCourse = Partial<TCoursePayload>;
 
-export type TGetCourseByIdResponse = Pick<TCourseDocument, 'title' | 'cover' | 'description'> & {
+export type TGetCourseByIdResponse = Pick<TCourseDocument, 'title' | 'cover' | 'description' | 'status' | 'rating'> & {
   isCurrentUserJoined: boolean;
   totalJoined: number;
   lessons: Array<Pick<TLessonDocument, 'title' | 'type' | 'duration' | '_id'> & Pick<TUserLessonDocument, 'status'>>;
@@ -20,5 +20,5 @@ export type TGetCourseNavigatePayload = {
 };
 
 export type TGetCourseNavigateResponse = {
-  lessons: Array<Pick<TLessonDocument, 'title' | 'type'>>;
+  lessons: Array<Pick<TLessonDocument, 'title' | 'type'> & Pick<TUserLessonDocument, 'status'>>;
 };

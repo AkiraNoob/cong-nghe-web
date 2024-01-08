@@ -2,6 +2,7 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import StarIcon from '@mui/icons-material/Star';
 import { CardMedia } from '@mui/material';
 import { yellow } from '@mui/material/colors';
+import moment from 'moment';
 import React from 'react';
 interface SttCourseProps {
   id: string;
@@ -45,7 +46,7 @@ const SttCourse: React.FC<SttCourseProps> = ({
           <span>
             <b>Ngày tạo</b>
           </span>
-          <span>{new Date(time).toLocaleDateString()}</span>
+          <span>{moment(time).format('DD/MM/YYYY')}</span>
         </div>
         <div className="flex justify-between mt-4">
           <span>

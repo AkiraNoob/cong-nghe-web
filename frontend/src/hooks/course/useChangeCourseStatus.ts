@@ -5,7 +5,7 @@ import { postChangeCourseStatus } from '~/api/course.api';
 import { parseErrorMessage } from '~/helper/parseErrorMessage';
 import { TError } from '~/types/generic.types';
 
-const useChangeCourseStatus = (config?: Partial<UseMutationOptions<string, TError, string, unknown>>) => {
+const useChangeCourseStatus = (config?: Partial<UseMutationOptions<string, TError, void, unknown>>) => {
   const { courseId } = useParams();
 
   const mutationReturn = useMutation({
@@ -17,10 +17,10 @@ const useChangeCourseStatus = (config?: Partial<UseMutationOptions<string, TErro
     onError(_err, _key, _config) {
       const msg = parseErrorMessage(_err);
       if (Array.isArray(msg)) {
-        return msg.map((item) => toast(item));
+        return msg.map((item) => toast(item, { type: 'error' }));
       }
 
-      return toast(msg);
+      return toast(msg, { type: 'error' });
     },
     ...config,
   });

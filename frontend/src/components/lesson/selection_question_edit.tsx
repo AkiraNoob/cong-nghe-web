@@ -4,7 +4,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Radio, TextField, Typography } from '@mui/material';
 import _ from 'lodash';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ESelectionAnswerChoiceList } from '~/constant/enum/lesson.enum';
 import { TSelectionLessonResourse } from '~/types/api/lesson.types';
 
@@ -41,13 +41,9 @@ const SelectionQuestion: React.FC<SelectionQuestionProps> = ({
     { index: ESelectionAnswerChoiceList.D, content: answerD, setContent: setAnswerD },
   ];
 
-  const triggerUpdate = useCallback(
-    _.debounce(
-      () => handleUpdateResouce({ correctAnswer, answerA, answerB, answerC, answerD, question, explanation }),
-      500,
-    ),
-    [],
-  );
+  const triggerUpdate = _.debounce(() => {
+    handleUpdateResouce({ correctAnswer, answerA, answerB, answerC, answerD, question, explanation });
+  }, 1000);
 
   useEffect(() => {
     triggerUpdate();
