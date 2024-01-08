@@ -1,5 +1,6 @@
 import { Request } from 'express';
 import moment from 'moment';
+import { Script, createContext } from 'node:vm';
 import { ELessonType, EUserLessonStatus } from '../../constant/enum/lesson.enum';
 import AppError from '../../constant/error';
 import { EHttpStatus } from '../../constant/statusCode';
@@ -146,12 +147,38 @@ const userLessonService = {
       courseId: reqBody.courseId,
     });
 
-    const status = EUserLessonStatus.Done;
+    const code = (reqBody.submit as TUserCodescriptLessonResultSubmit).code;
+
+    const script = new Script(decodeURIComponent(code));
+
+    const result = (lesson.resource as TCodescriptLessonResourse[]).map((item) => {
+      const context = {
+        console: console,
+
+        input: item.input,
+        expected: item.expected,
+      };
+
+      try {
+        script.runInContext(createContext(context));
+
+        if (context.input === context.expected) {
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.log(error);
+
+        return false;
+      }
+    });
 
     const checkpoint = {
-      code: (reqBody.submit as TUserCodescriptLessonResultSubmit).code,
-      result: new Array((lesson.resource as TCodescriptLessonResourse[]).length).fill(false),
+      code: code,
+      result,
     };
+
+    const status = result.every((item) => item) ? EUserLessonStatus.Done : EUserLessonStatus.Pending;
 
     if (previousUserLesson) {
       previousUserLesson.checkpoint = checkpoint;
