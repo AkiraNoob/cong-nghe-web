@@ -8,6 +8,7 @@ import fileRoute from './file/route';
 import lessonRoute from './lesson/route';
 import statisticRoute from './statistic/route';
 import userRoute from './user/route';
+import userCourseRoute from './userCourse/route';
 import userLessonRoute from './userLessons/route';
 const apiRoute = express.Router();
 
@@ -19,5 +20,6 @@ apiRoute.use('/course', courseRoute);
 apiRoute.use('/statistic', authenticateMiddleware, userRolePermissionMiddleware(), statisticRoute);
 apiRoute.use('/file', authenticateMiddleware, fileRoute);
 apiRoute.use('/comment', commentRoute);
+apiRoute.use('/user-courses', authenticateMiddleware, userRolePermissionMiddleware(), userCourseRoute);
 
 export default apiRoute;
