@@ -119,9 +119,6 @@ const CodeScriptLesson = ({ resource }: { resource: TCodescriptLessonResourse[] 
                     Input: <span>{item.input}</span>
                   </p>
                   <p className="text-[#C9C9C9]">
-                    Output: <span>{item.input}</span>
-                  </p>
-                  <p className="text-[#C9C9C9]">
                     Expected: <span>{item.expected}</span>
                   </p>
                 </div>
