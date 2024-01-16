@@ -5,6 +5,7 @@
 `Advice`: you should stand in the main dir to install package, not this backend sub-folder to have husky checking commit and frontend node_modules.
 
 ```console
+$ cp .env.example .env
 $ npm install
 $ npm run dev
 ```
